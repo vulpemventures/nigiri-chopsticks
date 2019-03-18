@@ -1,6 +1,6 @@
 # Nigiri chopsticks
 
-A simple web server written in golang that proxies requests to (*Nigiri*)[https://github.com/vulpemventures/nigiri.git] services and expose 2 native endpoints:
+A simple web server written in golang that proxies requests to [*Nigiri*](https://github.com/vulpemventures/nigiri.git) services and expose 2 native endpoints:
 
 * `POST /send` faucet endpoint that expects a receiving address in the request body `{"address":<receiving_address}`.
 * `POST /broadcast` endpoint that pushes a signed transaction to the network and mines a block to get it confirmed.
