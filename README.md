@@ -2,7 +2,7 @@
 
 A simple web server written in golang that proxies requests to [*Nigiri*](https://github.com/vulpemventures/nigiri.git) services and expose 2 native endpoints:
 
-* `POST /send` faucet endpoint that expects a receiving address in the request body `{"address":<receiving_address}`.
+* `POST /faucet` faucet endpoint that expects a receiving address in the request body `{"address":<receiving_address}`.
 * `POST /broadcast` endpoint that pushes a signed transaction to the network and mines a block to get it confirmed.
 
 ## Usage
@@ -43,14 +43,16 @@ The web server starts at default address `localhost:3000` with the following rou
 
 * `/faucet` includes `/send` and `/broadcast` endpoints
 * `/esplora` includes all *electrs* API endpoints
-* `/regtest` to directly communicate with the bitcoin daemon through JSONRPC requests (TODO)
-* `/liquid` to directly communicate with the liquid daemon through JSONRPC requests (TODO)
 
 To customize server urls and ports use flags when running the binary:
 
-* `--addr` server listening address (default `localhost:3000`)
+* `--host` server listening address (default `localhost:3000`)
 * `--btc-cookie` btc RPC server user and password (default `admin1:123`)
-* `--btc-addr` btc RPC server listening address (default `localhost:19001`)
-* `--liquid-addr` liquid RPC server listening address (default `localhost:18884`)
-* `--electrs-addr` electrs HTTP server listening address (default `localhost:3002`)
-* `--proto` specify using either `http` or `https` (default `http` - TODO)
+* `--btc-rpc-addr` btc RPC server listening address. If not specified rpc will be disabled (default `localhost:19001`)
+* `--liquid-prc-addr` liquid RPC server listening address. If not specified rpc will be disabled (default `localhost:18884`)
+* `--rest-addr` electrs REST HTTP server listening address (default `localhost:3002`)
+* `--grpc-addr` electrs gRPC server listening address
+* `--use-tls` specify using either `http` or `https` (default `http` - TODO)
+**IDEA**
+* `--btc-disable-wallet` specify bitcoin.conf disablewallet flag
+* `--liquid-disable-wallet` specify liquid.conf disablewallet flag 
