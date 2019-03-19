@@ -9,6 +9,7 @@ import (
 const (
 	defaultTLSEnabled    = false
 	defaultFaucetEnabled = true
+	defaultMiningEnabled = true
 
 	defaultAddr        = "localhost:3000"
 	defaultElectrsAddr = "localhost:3002"
@@ -22,6 +23,7 @@ type Config struct {
 	Server struct {
 		TLSEnabled    bool
 		FaucetEnabled bool
+		MiningEnabled bool
 		Host          string
 		Port          string
 	}
@@ -39,6 +41,7 @@ type Config struct {
 func NewConfigFromFlags() (Config, error) {
 	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https}")
 	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to true to use faucet")
+	miningEnabled := flag.Bool("use-mining", defaultMiningEnabled, "set to false to disable block mining right after broadcasting requests")
 
 	addr := flag.String("addr", defaultAddr, "Listen address")
 	electrsAddr := flag.String("electrs-addr", defaultElectrsAddr, "Elctrs HTTP server address")
@@ -68,6 +71,7 @@ func NewConfigFromFlags() (Config, error) {
 	c := Config{}
 	c.Server.TLSEnabled = *tlsEnabled
 	c.Server.FaucetEnabled = *faucetEnabled
+	c.Server.MiningEnabled = *miningEnabled
 	c.Server.Host = host
 	c.Server.Port = port
 

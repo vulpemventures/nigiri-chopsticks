@@ -11,7 +11,7 @@ import (
 func (r *Router) ProxyBroadcast(res http.ResponseWriter, req *http.Request) {
 	r.ProxyElectrs(res, req)
 
-	if r.Config.Server.FaucetEnabled {
+	if r.Config.Server.MiningEnabled {
 		url := fmt.Sprintf("http://%s:%s", r.Config.Faucet.Host, r.Config.Faucet.Port)
 		status, resp, err := post(url, "", nil)
 		if err != nil {
