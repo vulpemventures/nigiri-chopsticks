@@ -17,11 +17,11 @@ func NewRouter(config cfg.Config) *Router {
 
 	r := &Router{router, config}
 
-	r.HandleFunc("/faucet/send", r.Send).Methods("POST")
-	r.HandleFunc("/faucet/broadcast", r.Broadcast).Methods("POST")
-	r.PathPrefix("/esplora/").HandlerFunc(r.ProxyElectrs)
-	// r.PathPrefix("/regtest/").HandlerFunc(r.ProxyBitcoin)
-	// r.PathPrefix("/liquid/").HandlerFunc(r.ProxyLiquid)
+	if config.Server.FaucetEnabled {
+		r.HandleFunc("/faucet", r.ProxyFaucet).Methods("POST")
+	}
+	r.HandleFunc("/tx", r.ProxyBroadcast).Methods("POST")
+	r.PathPrefix("/").HandlerFunc(r.ProxyElectrs)
 
 	return r
 }

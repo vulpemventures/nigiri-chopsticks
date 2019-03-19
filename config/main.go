@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	defaultProto = "http"
+	defaultTLSEnabled    = false
+	defaultFaucetEnabled = true
 
 	defaultAddr        = "localhost:3000"
 	defaultElectrsAddr = "localhost:3002"
-	defaultBtcAddr     = "localhost:19001"
-	defaultLiquidAddr  = "localhost:18884"
+	defaultFaucetAddr  = "localhost:3001"
 
 	defaultBtcCookie = "admin1:123"
 )
@@ -20,21 +20,16 @@ const (
 // Config type is used to parse flag options
 type Config struct {
 	Server struct {
-		Proto string
-		Host  string
-		Port  string
+		TLSEnabled    bool
+		FaucetEnabled bool
+		Host          string
+		Port          string
 	}
 	Electrs struct {
 		Host string
 		Port string
 	}
-	Bitcoin struct {
-		Host        string
-		Port        string
-		RPCUser     string
-		RPCPassword string
-	}
-	Liquid struct {
+	Faucet struct {
 		Host string
 		Port string
 	}
@@ -42,20 +37,15 @@ type Config struct {
 
 // NewConfigFromFlags parses flags and returns a Config
 func NewConfigFromFlags() (Config, error) {
-	proto := flag.String("proto", defaultProto, "Proto {http|https}")
+	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https}")
+	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to true to use faucet")
+
 	addr := flag.String("addr", defaultAddr, "Listen address")
 	electrsAddr := flag.String("electrs-addr", defaultElectrsAddr, "Elctrs HTTP server address")
-	btcAddr := flag.String("btc-addr", defaultBtcAddr, "Bitcoin RPC server address")
-	btcCookie := flag.String("btc-cookie", defaultBtcCookie, "Colon separated (:) bitcoin RPC user and password")
-	liquidAddr := flag.String("liquid-addr", defaultLiquidAddr, "Liquid RPC server address")
+	faucetAddr := flag.String("faucet-addr", defaultFaucetAddr, "Faucet server address")
 	flag.Parse()
 
 	config := Config{}
-
-	if *proto != "http" && *proto != "https" {
-		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid proto")
-	}
 
 	host, port, ok := splitString(*addr)
 	if !ok {
@@ -69,39 +59,23 @@ func NewConfigFromFlags() (Config, error) {
 		return config, fmt.Errorf("Invalid electrs HTTP server address")
 	}
 
-	btcHost, btcPort, ok := splitString(*btcAddr)
+	faucetHost, faucetPort, ok := splitString(*faucetAddr)
 	if !ok {
 		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid bitcoin RPC server address")
-	}
-
-	liquidHost, liquidPort, ok := splitString(*liquidAddr)
-	if !ok {
-		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid liquid RPC server address")
-	}
-
-	btcUser, btcPassword, ok := splitString(*btcCookie)
-	if !ok {
-		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid bitcoin RPC cookie")
+		return config, fmt.Errorf("Invalid faucet HTTP server address")
 	}
 
 	c := Config{}
-	c.Server.Proto = *proto
+	c.Server.TLSEnabled = *tlsEnabled
+	c.Server.FaucetEnabled = *faucetEnabled
 	c.Server.Host = host
 	c.Server.Port = port
 
 	c.Electrs.Host = electrsHost
 	c.Electrs.Port = electrsPort
 
-	c.Bitcoin.Host = btcHost
-	c.Bitcoin.Port = btcPort
-	c.Bitcoin.RPCUser = btcUser
-	c.Bitcoin.RPCPassword = btcPassword
-
-	c.Liquid.Host = liquidHost
-	c.Liquid.Port = liquidPort
+	c.Faucet.Host = faucetHost
+	c.Faucet.Port = faucetPort
 
 	return c, nil
 }
