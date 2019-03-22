@@ -13,9 +13,8 @@ const (
 
 	defaultAddr        = "localhost:3000"
 	defaultElectrsAddr = "localhost:3002"
-	defaultFaucetAddr  = "localhost:3001"
-
-	defaultBtcCookie = "admin1:123"
+	defaultRPCAddr     = "localhost:19001"
+	defaultRPCCookie   = "admin1:123"
 )
 
 // Config type is used to parse flag options
@@ -31,44 +30,51 @@ type Config struct {
 		Host string
 		Port string
 	}
-	Faucet struct {
-		Host string
-		Port string
+	RPCServer struct {
+		User     string
+		Password string
+		Host     string
+		Port     string
 	}
 }
 
 // NewConfigFromFlags parses flags and returns a Config
-func NewConfigFromFlags() (Config, error) {
+func NewConfigFromFlags() (*Config, error) {
 	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https}")
 	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to true to use faucet")
 	miningEnabled := flag.Bool("use-mining", defaultMiningEnabled, "set to false to disable block mining right after broadcasting requests")
 
 	addr := flag.String("addr", defaultAddr, "Listen address")
 	electrsAddr := flag.String("electrs-addr", defaultElectrsAddr, "Elctrs HTTP server address")
-	faucetAddr := flag.String("faucet-addr", defaultFaucetAddr, "Faucet server address")
+	rpcAddr := flag.String("rpc-addr", defaultRPCAddr, "RPC server address")
+	rpcCookie := flag.String("rpc-cookie", defaultRPCCookie, "RPC server user and password")
 	flag.Parse()
-
-	config := Config{}
 
 	host, port, ok := splitString(*addr)
 	if !ok {
 		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid server address")
+		return nil, fmt.Errorf("Invalid server address")
 	}
 
 	electrsHost, electrsPort, ok := splitString(*electrsAddr)
 	if !ok {
 		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid electrs HTTP server address")
+		return nil, fmt.Errorf("Invalid electrs HTTP server address")
 	}
 
-	faucetHost, faucetPort, ok := splitString(*faucetAddr)
+	rpcHost, rpcPort, ok := splitString(*rpcAddr)
 	if !ok {
 		flag.PrintDefaults()
-		return config, fmt.Errorf("Invalid faucet HTTP server address")
+		return nil, fmt.Errorf("Invalid RPC server address")
 	}
 
-	c := Config{}
+	rpcUser, rpcPassword, ok := splitString(*rpcCookie)
+	if !ok {
+		flag.PrintDefaults()
+		return nil, fmt.Errorf("Invalid RPC server cookie")
+	}
+
+	c := &Config{}
 	c.Server.TLSEnabled = *tlsEnabled
 	c.Server.FaucetEnabled = *faucetEnabled
 	c.Server.MiningEnabled = *miningEnabled
@@ -78,10 +84,20 @@ func NewConfigFromFlags() (Config, error) {
 	c.Electrs.Host = electrsHost
 	c.Electrs.Port = electrsPort
 
-	c.Faucet.Host = faucetHost
-	c.Faucet.Port = faucetPort
+	c.RPCServer.Host = rpcHost
+	c.RPCServer.Port = rpcPort
+	c.RPCServer.User = rpcUser
+	c.RPCServer.Password = rpcPassword
 
 	return c, nil
+}
+
+func (c *Config) RPCServerURL() string {
+	return fmt.Sprintf("http://%s:%s@%s:%s", c.RPCServer.User, c.RPCServer.Password, c.RPCServer.Host, c.RPCServer.Port)
+}
+
+func (c *Config) ElectrsURL() string {
+	return fmt.Sprintf("http://%s:%s", c.Electrs.Host, c.Electrs.Port)
 }
 
 func splitString(addr string) (string, string, bool) {
