@@ -12,6 +12,10 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
+type Faucet interface {
+	Send(res http.ResponseWriter, req *http.Request)
+}
+
 func makeHTTPServer(handler http.Handler) *http.Server {
 	return &http.Server{
 		ReadTimeout:  5 * time.Second,
@@ -33,7 +37,8 @@ func main() {
 		"mining-enabled":  config.Server.MiningEnabled,
 		"address":         fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port),
 		"electrs_address": fmt.Sprintf("%s:%s", config.Electrs.Host, config.Electrs.Port),
-		"faucet_address":  fmt.Sprintf("%s:%s", config.Faucet.Host, config.Faucet.Port),
+		"rpc_address":     fmt.Sprintf("%s:%s", config.RPCServer.Host, config.RPCServer.Port),
+		"rpc_cookie":      fmt.Sprintf("%s:%s", config.RPCServer.User, config.RPCServer.Password),
 	}).Info("Starting server with configuration:")
 
 	r := router.NewRouter(config)

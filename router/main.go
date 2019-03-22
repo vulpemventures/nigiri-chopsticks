@@ -3,22 +3,27 @@ package router
 import (
 	"github.com/gorilla/mux"
 	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
+	"github.com/vulpemventures/nigiri-chopsticks/faucet"
+	"github.com/vulpemventures/nigiri-chopsticks/faucet/regtest"
 )
 
 // Router extends gorilla Router
 type Router struct {
 	*mux.Router
-	Config cfg.Config
+	Config *cfg.Config
+	Faucet faucet.Faucet
 }
 
 // NewRouter returns a new Router instance
-func NewRouter(config cfg.Config) *Router {
+func NewRouter(config *cfg.Config) *Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	r := &Router{router, config}
+	r := &Router{router, config, nil}
 
 	if config.Server.FaucetEnabled {
-		r.HandleFunc("/faucet", r.ProxyFaucet).Methods("POST")
+		url := r.Config.RPCServerURL()
+		r.Faucet = regtestfaucet.NewFaucet(url)
+		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
 	}
 	r.HandleFunc("/tx", r.ProxyBroadcast).Methods("POST")
 	r.PathPrefix("/").HandlerFunc(r.ProxyElectrs)

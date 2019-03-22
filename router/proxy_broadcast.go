@@ -1,7 +1,7 @@
 package router
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -12,8 +12,9 @@ func (r *Router) ProxyBroadcast(res http.ResponseWriter, req *http.Request) {
 	r.ProxyElectrs(res, req)
 
 	if r.Config.Server.MiningEnabled {
-		url := fmt.Sprintf("http://%s:%s", r.Config.Faucet.Host, r.Config.Faucet.Port)
-		status, resp, err := post(url, "", nil)
+		url := r.Config.RPCServerURL()
+		body := `{"jsonrpc":"1.0", "id": "2", "method":"generate", "params":[1]}`
+		status, resp, err := post(url, body, nil)
 		if err != nil {
 			log.WithError(err).Warning("Error while mining a block")
 		}
@@ -22,6 +23,10 @@ func (r *Router) ProxyBroadcast(res http.ResponseWriter, req *http.Request) {
 				"response": resp,
 				"status":   status,
 			}).Warning("Error while mining a block")
+		} else {
+			out := map[string]string{}
+			json.Unmarshal([]byte(resp), &out)
+			log.WithField("block_hash", out["result"]).Info("Block mined")
 		}
 	}
 }
