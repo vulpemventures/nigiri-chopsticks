@@ -43,7 +43,8 @@ The web server starts at default address `localhost:3000` with the following rou
 * all [esplora](https://github.com/blockstream/esplora/blob/master/API.md) HTTP API endpoints
 
 **Note:**  
-If mining is enabled, the esplora broadcast endpoint is wrapped so that a block is mined just after the transaction is published to get it confirmed; this is useful when running in regtest network.
+If mining is enabled, the esplora broadcast endpoint is wrapped so that a block is mined just after the transaction is published to get it confirmed; this is useful when running in regtest network.  
+All requests to chopsticks are (optionally) logged using a logger inspired by [negroni](https://github.com/urfave/negroni) package.
 
 To customize server urls and ports use flags when running the binary:
 
@@ -54,4 +55,6 @@ To customize server urls and ports use flags when running the binary:
 * `--electrs-addr` electrs HTTP server listening address (default `localhost:3002`)
 * `--use-tls` specify using either `http` or `https` (default `true`)
 * `--use-faucet` to have a /faucet endpoint available for sending funds
-* `--use-mining` to have the esplora /broadcast endpoint wrapped so that a block is mined after the transaction is published
+* `--use-mining` to have the esplora /broadcast endpoint wrapped so that a block is mined after the transaction 
+is published
+* `--use-logger` to log every request/response 
