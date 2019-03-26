@@ -1,6 +1,6 @@
 # Nigiri chopsticks
 
-This is an API passwthrough that simply proxies requests to the underlying services.
+This is an API passthrough that simply proxies requests to the underlying services.
 It expects an electrum REST server and an optional RPC server for faucet and custom broadcasting services.
 
 ## Usage
@@ -43,7 +43,7 @@ The web server starts at default address `localhost:3000` with the following rou
 * all [esplora](https://github.com/blockstream/esplora/blob/master/API.md) HTTP API endpoints
 
 **Note:**  
-If the mining is enabled, the esplora broadcast endpoint is wrapped so that a block is mined just after the transaction is published to get it confirmed; this is useful when running in regtest network.
+If mining is enabled, the esplora broadcast endpoint is wrapped so that a block is mined just after the transaction is published to get it confirmed; this is useful when running in regtest network.
 
 To customize server urls and ports use flags when running the binary:
 
