@@ -27,9 +27,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:058e9504b9a79bfe86092974d05bb3298d2aa0c312d266d43148de289a5065d9"
+  digest = "1:94500f8d26a25e96c151343f47cb054787a61e8a58b29b7156ae7a4ab65cac18"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "acme",
+    "acme/autocert",
+    "ssh/terminal",
+  ]
   pruneopts = "UT"
   revision = "a1f597ede03a7bef967a422b5b3a5bd08805a01e"
 
@@ -50,6 +54,7 @@
   input-imports = [
     "github.com/gorilla/mux",
     "github.com/sirupsen/logrus",
+    "golang.org/x/crypto/acme/autocert",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
