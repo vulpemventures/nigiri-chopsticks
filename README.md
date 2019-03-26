@@ -1,9 +1,7 @@
-# Nigiri chopsticks
+# Nigiri chopsticks
 
-A simple web server written in golang that proxies requests to [*Nigiri*](https://github.com/vulpemventures/nigiri.git) services and exposes 2 native endpoints:
-
-* `POST /send` faucet endpoint that expects a receiving address in the request body `{"address": <receiving_address>}`.
-* `POST /broadcast` endpoint that pushes a signed transaction to the network and mines a block to get it confirmed.
+This is an API passwthrough that simply proxies requests to the underlying services.
+It expects an electrum REST server and an optional RPC server for faucet and custom broadcasting services.
 
 ## Usage
 
@@ -41,16 +39,19 @@ nigiri-chopsticks $ ./build/nigiri-chopsticks-darwin-amd64
 
 The web server starts at default address `localhost:3000` with the following routes:
 
-* `/faucet` includes `/send` and `/broadcast` endpoints
-* `/esplora` includes all *electrs* API endpoints
-* `/regtest` to directly communicate with the bitcoin daemon through JSONRPC requests (TODO)
-* `/liquid` to directly communicate with the liquid daemon through JSONRPC requests (TODO)
+* `/faucet` if faucet is enabled, to send funds to an address
+* all [esplora](https://github.com/blockstream/esplora/blob/master/API.md) HTTP API endpoints
+
+**Note:**  
+If the mining is enabled, the esplora broadcast endpoint is wrapped so that a block is mined just after the transaction is published to get it confirmed; this is useful when running in regtest network.
 
 To customize server urls and ports use flags when running the binary:
 
 * `--addr` server listening address (default `localhost:3000`)
-* `--btc-cookie` btc RPC server user and password (default `admin1:123`)
 * `--btc-addr` btc RPC server listening address (default `localhost:19001`)
+* `--btc-cookie` btc RPC server user and password (default `admin1:123`)
 * `--liquid-addr` liquid RPC server listening address (default `localhost:18884`)
 * `--electrs-addr` electrs HTTP server listening address (default `localhost:3002`)
-* `--proto` specify using either `http` or `https` (default `http` - TODO)
+* `--use-tls` specify using either `http` or `https` (default `true`)
+* `--use-faucet` to have a /faucet endpoint available for sending funds
+* `--use-mining` to have the esplora /broadcast endpoint wrapped so that a block is mined after the transaction is published
