@@ -32,9 +32,10 @@ func main() {
 	}
 
 	log.WithFields(log.Fields{
-		"tls-enabled":     config.Server.TLSEnabled,
-		"faucet-enabled":  config.Server.FaucetEnabled,
-		"mining-enabled":  config.Server.MiningEnabled,
+		"tls_enabled":     config.Server.TLSEnabled,
+		"faucet_enabled":  config.Server.FaucetEnabled,
+		"mining_enabled":  config.Server.MiningEnabled,
+		"logger_enabled":  config.Server.LoggerEnabled,
 		"address":         fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port),
 		"electrs_address": fmt.Sprintf("%s:%s", config.Electrs.Host, config.Electrs.Port),
 		"rpc_address":     fmt.Sprintf("%s:%s", config.RPCServer.Host, config.RPCServer.Port),

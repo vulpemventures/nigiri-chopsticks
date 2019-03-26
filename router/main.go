@@ -27,7 +27,9 @@ func NewRouter(config *cfg.Config) *Router {
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
 	}
 
-	r.Use(middleware.Logger)
+	if config.Server.LoggerEnabled {
+		r.Use(middleware.Logger)
+	}
 	r.HandleFunc("/tx", r.ProxyBroadcast).Methods("POST")
 	r.PathPrefix("/").HandlerFunc(r.ProxyElectrs)
 

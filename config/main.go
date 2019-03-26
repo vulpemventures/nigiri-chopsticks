@@ -8,6 +8,7 @@ import (
 
 const (
 	defaultTLSEnabled    = false
+	deafultLoggerEnabled = false
 	defaultFaucetEnabled = true
 	defaultMiningEnabled = true
 
@@ -23,6 +24,7 @@ type Config struct {
 		TLSEnabled    bool
 		FaucetEnabled bool
 		MiningEnabled bool
+		LoggerEnabled bool
 		Host          string
 		Port          string
 	}
@@ -48,6 +50,7 @@ func NewConfigFromFlags() (*Config, error) {
 	electrsAddr := flag.String("electrs-addr", defaultElectrsAddr, "Elctrs HTTP server address")
 	rpcAddr := flag.String("rpc-addr", defaultRPCAddr, "RPC server address")
 	rpcCookie := flag.String("rpc-cookie", defaultRPCCookie, "RPC server user and password")
+	loggerEnabled := flag.Bool("use-logger", deafultLoggerEnabled, "Set true to log every request/response")
 	flag.Parse()
 
 	host, port, ok := splitString(*addr)
@@ -75,6 +78,7 @@ func NewConfigFromFlags() (*Config, error) {
 	}
 
 	c := &Config{}
+	c.Server.LoggerEnabled = *loggerEnabled
 	c.Server.TLSEnabled = *tlsEnabled
 	c.Server.FaucetEnabled = *faucetEnabled
 	c.Server.MiningEnabled = *miningEnabled
