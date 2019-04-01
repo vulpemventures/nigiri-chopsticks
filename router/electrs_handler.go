@@ -6,8 +6,8 @@ import (
 	"net/url"
 )
 
-// ProxyElectrs forwards every request to the /esplora endpoint to electrs HTTP server
-func (r *Router) ProxyElectrs(res http.ResponseWriter, req *http.Request) {
+// HandleElectrsRequest forwards every request to the electrs HTTP server
+func (r *Router) HandleElectrsRequest(res http.ResponseWriter, req *http.Request) {
 	electrsURL := r.Config.ElectrsURL()
 	parsedURL, _ := url.Parse(electrsURL)
 

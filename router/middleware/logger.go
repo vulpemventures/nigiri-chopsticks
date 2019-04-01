@@ -23,11 +23,12 @@ func Logger(next http.Handler) http.Handler {
 			"hostname":   r.Host,
 			"path":       r.URL.Path,
 			"status":     res.Status(),
-			"response":   prettyString(res.Body()),
+			"response":   prettyJSON(res.Body()),
 		}).Info("New request from remote address: ", r.RemoteAddr)
 	})
 }
 
-func prettyString(b []byte) string {
-	return strings.Replace(string(b), "\"", "'", -1)
+func prettyJSON(b []byte) string {
+	replacer := strings.NewReplacer("\"", "'", "\n", "")
+	return replacer.Replace(string(b))
 }

@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,53 +11,53 @@ import (
 
 var client = &http.Client{Timeout: 10 * time.Second}
 
-func get(url string, header map[string]string) (int, string, error) {
+func get(url string, headers map[string]string) (int, string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return http.StatusInternalServerError, "", err
 	}
 
-	for key, value := range header {
+	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
 
-	rs, err := client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
-		return http.StatusInternalServerError, "", errors.New("Failed to create named key request: " + err.Error())
+		return http.StatusInternalServerError, "", err
 	}
-	defer rs.Body.Close()
+	defer resp.Body.Close()
 
-	bodyBytes, err := ioutil.ReadAll(rs.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return http.StatusInternalServerError, "", errors.New("Failed to parse response body: " + err.Error())
+		return http.StatusInternalServerError, "", err
 	}
 
-	return rs.StatusCode, string(bodyBytes), nil
+	return resp.StatusCode, string(respBody), nil
 }
 
-func post(url string, bodyString string, header map[string]string) (int, string, error) {
+func post(url string, bodyString string, headers map[string]string) (int, string, error) {
 	body := strings.NewReader(bodyString)
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return http.StatusInternalServerError, "", err
 	}
 
-	for key, value := range header {
+	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
 
-	rs, err := client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
-		return http.StatusInternalServerError, "", errors.New("Failed to create named key request: " + err.Error())
+		return http.StatusInternalServerError, "", err
 	}
-	defer rs.Body.Close()
+	defer resp.Body.Close()
 
-	bodyBytes, err := ioutil.ReadAll(rs.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return http.StatusInternalServerError, "", errors.New("Failed to parse response body: " + err.Error())
+		return http.StatusInternalServerError, "", err
 	}
 
-	return rs.StatusCode, string(bodyBytes), nil
+	return resp.StatusCode, string(respBody), nil
 }
 
 func parseRequestBody(body io.ReadCloser) map[string]string {

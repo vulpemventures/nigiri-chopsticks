@@ -19,29 +19,39 @@ const (
 )
 
 // Config type is used to parse flag options
-type Config struct {
-	Server struct {
-		TLSEnabled    bool
-		FaucetEnabled bool
-		MiningEnabled bool
-		LoggerEnabled bool
-		Host          string
-		Port          string
+type Config interface {
+	IsTLSEnabled() bool
+	IsFaucetEnabled() bool
+	IsLoggerEnabled() bool
+	IsMiningEnabled() bool
+	ListenURL() string
+	RPCServerURL() string
+	ElectrsURL() string
+}
+
+type config struct {
+	server struct {
+		tlsEnabled    bool
+		faucetEnabled bool
+		miningEnabled bool
+		loggerEnabled bool
+		host          string
+		port          string
 	}
-	Electrs struct {
-		Host string
-		Port string
+	electrs struct {
+		host string
+		port string
 	}
-	RPCServer struct {
-		User     string
-		Password string
-		Host     string
-		Port     string
+	rpcServer struct {
+		user     string
+		password string
+		host     string
+		port     string
 	}
 }
 
 // NewConfigFromFlags parses flags and returns a Config
-func NewConfigFromFlags() (*Config, error) {
+func NewConfigFromFlags() (Config, error) {
 	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https}")
 	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to true to use faucet")
 	miningEnabled := flag.Bool("use-mining", defaultMiningEnabled, "set to false to disable block mining right after broadcasting requests")
@@ -77,31 +87,51 @@ func NewConfigFromFlags() (*Config, error) {
 		return nil, fmt.Errorf("Invalid RPC server cookie")
 	}
 
-	c := &Config{}
-	c.Server.LoggerEnabled = *loggerEnabled
-	c.Server.TLSEnabled = *tlsEnabled
-	c.Server.FaucetEnabled = *faucetEnabled
-	c.Server.MiningEnabled = *miningEnabled
-	c.Server.Host = host
-	c.Server.Port = port
+	c := &config{}
+	c.server.loggerEnabled = *loggerEnabled
+	c.server.tlsEnabled = *tlsEnabled
+	c.server.faucetEnabled = *faucetEnabled
+	c.server.miningEnabled = *miningEnabled
+	c.server.host = host
+	c.server.port = port
 
-	c.Electrs.Host = electrsHost
-	c.Electrs.Port = electrsPort
+	c.electrs.host = electrsHost
+	c.electrs.port = electrsPort
 
-	c.RPCServer.Host = rpcHost
-	c.RPCServer.Port = rpcPort
-	c.RPCServer.User = rpcUser
-	c.RPCServer.Password = rpcPassword
+	c.rpcServer.host = rpcHost
+	c.rpcServer.port = rpcPort
+	c.rpcServer.user = rpcUser
+	c.rpcServer.password = rpcPassword
 
 	return c, nil
 }
 
-func (c *Config) RPCServerURL() string {
-	return fmt.Sprintf("http://%s:%s@%s:%s", c.RPCServer.User, c.RPCServer.Password, c.RPCServer.Host, c.RPCServer.Port)
+func (c *config) IsTLSEnabled() bool {
+	return c.server.tlsEnabled
 }
 
-func (c *Config) ElectrsURL() string {
-	return fmt.Sprintf("http://%s:%s", c.Electrs.Host, c.Electrs.Port)
+func (c *config) IsFaucetEnabled() bool {
+	return c.server.faucetEnabled
+}
+
+func (c *config) IsLoggerEnabled() bool {
+	return c.server.loggerEnabled
+}
+
+func (c *config) IsMiningEnabled() bool {
+	return c.server.miningEnabled
+}
+
+func (c *config) ListenURL() string {
+	return fmt.Sprintf("%s:%s", c.server.host, c.server.port)
+}
+
+func (c *config) RPCServerURL() string {
+	return fmt.Sprintf("http://%s:%s@%s:%s", c.rpcServer.user, c.rpcServer.password, c.rpcServer.host, c.rpcServer.port)
+}
+
+func (c *config) ElectrsURL() string {
+	return fmt.Sprintf("http://%s:%s", c.electrs.host, c.electrs.port)
 }
 
 func splitString(addr string) (string, string, bool) {

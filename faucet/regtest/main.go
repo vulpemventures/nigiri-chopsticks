@@ -1,24 +1,28 @@
 package regtestfaucet
 
-import (
-	"github.com/vulpemventures/nigiri-chopsticks/faucet"
-)
+import "github.com/vulpemventures/nigiri-chopsticks/faucet"
 
 type regtestfaucet struct {
 	URL string
 }
 
-func (f *regtestfaucet) New(url string) {
-	f.URL = url
+// NewFaucet initialize a regtest faucet and returns it as interface
+func NewFaucet(url string) faucet.Faucet {
+	return &regtestfaucet{url}
 }
 
-func (f *regtestfaucet) Send(address string) (int, string, error) {
+func (f *regtestfaucet) NewTransaction(address string) (int, string, error) {
 	status, utxo, err := listunspent(f.URL)
 	if err != nil {
 		return status, "", err
 	}
 
-	status, tx, err := createrawtransaction(f.URL, utxo, address)
+	status, changeAddress, err := getrawchangeaddress(f.URL)
+	if err != nil {
+		return status, "", err
+	}
+
+	status, tx, err := createrawtransaction(f.URL, utxo, address, changeAddress)
 	if err != nil {
 		return status, "", err
 	}
@@ -29,12 +33,4 @@ func (f *regtestfaucet) Send(address string) (int, string, error) {
 	}
 
 	return status, signedTx, nil
-}
-
-// NewFaucet initialize a regtest faucet and returns it as interface
-func NewFaucet(url string) faucet.Faucet {
-	f := &regtestfaucet{}
-	f.New(url)
-
-	return f
 }
