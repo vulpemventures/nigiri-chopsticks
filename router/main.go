@@ -11,27 +11,27 @@ import (
 // Router extends gorilla Router
 type Router struct {
 	*mux.Router
-	Config *cfg.Config
+	Config cfg.Config
 	Faucet faucet.Faucet
 }
 
 // NewRouter returns a new Router instance
-func NewRouter(config *cfg.Config) *Router {
+func NewRouter(config cfg.Config) *Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	r := &Router{router, config, nil}
 
-	if config.Server.FaucetEnabled {
+	if r.Config.IsFaucetEnabled() {
 		url := r.Config.RPCServerURL()
 		r.Faucet = regtestfaucet.NewFaucet(url)
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
 	}
 
-	if config.Server.LoggerEnabled {
+	if config.IsLoggerEnabled() {
 		r.Use(middleware.Logger)
 	}
-	r.HandleFunc("/tx", r.ProxyBroadcast).Methods("POST")
-	r.PathPrefix("/").HandlerFunc(r.ProxyElectrs)
+	r.HandleFunc("/tx", r.HandleBroadcastRequest).Methods("POST")
+	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest)
 
 	return r
 }

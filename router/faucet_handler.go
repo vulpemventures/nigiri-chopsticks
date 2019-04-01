@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-// HandleFaucetRequest sends funds to the given address
+// HandleFaucetRequest sends funds to the address passed in the request body
 func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request) {
 	body := parseRequestBody(req.Body)
 
-	status, signedTx, err := r.Faucet.Send(body["address"])
+	status, signedTx, err := r.Faucet.NewTransaction(body["address"])
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return

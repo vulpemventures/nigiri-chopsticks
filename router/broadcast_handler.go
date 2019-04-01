@@ -7,11 +7,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// ProxyBroadcast forwards tx broadcast request to electrs and mines a block if using chopsticks
-func (r *Router) ProxyBroadcast(res http.ResponseWriter, req *http.Request) {
-	r.ProxyElectrs(res, req)
+// HandleBroadcastRequest forwards the request to the electrs HTTP server and mines a block if mining is enabled
+func (r *Router) HandleBroadcastRequest(res http.ResponseWriter, req *http.Request) {
+	r.HandleElectrsRequest(res, req)
 
-	if r.Config.Server.MiningEnabled {
+	if r.Config.IsMiningEnabled() {
 		url := r.Config.RPCServerURL()
 		body := `{"jsonrpc":"1.0", "id": "2", "method":"generate", "params":[1]}`
 		status, resp, err := post(url, body, nil)

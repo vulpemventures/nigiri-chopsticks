@@ -12,10 +12,6 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-type Faucet interface {
-	Send(res http.ResponseWriter, req *http.Request)
-}
-
 func makeHTTPServer(handler http.Handler) *http.Server {
 	return &http.Server{
 		ReadTimeout:  5 * time.Second,
@@ -32,27 +28,26 @@ func main() {
 	}
 
 	log.WithFields(log.Fields{
-		"tls_enabled":     config.Server.TLSEnabled,
-		"faucet_enabled":  config.Server.FaucetEnabled,
-		"mining_enabled":  config.Server.MiningEnabled,
-		"logger_enabled":  config.Server.LoggerEnabled,
-		"address":         fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port),
-		"electrs_address": fmt.Sprintf("%s:%s", config.Electrs.Host, config.Electrs.Port),
-		"rpc_address":     fmt.Sprintf("%s:%s", config.RPCServer.Host, config.RPCServer.Port),
-		"rpc_cookie":      fmt.Sprintf("%s:%s", config.RPCServer.User, config.RPCServer.Password),
+		"tls_enabled":    config.IsTLSEnabled(),
+		"faucet_enabled": config.IsFaucetEnabled(),
+		"mining_enabled": config.IsMiningEnabled(),
+		"logger_enabled": config.IsLoggerEnabled(),
+		"listen_url":     config.ListenURL(),
+		"electrs_url":    config.ElectrsURL(),
+		"rpc_server_url": config.RPCServerURL(),
 	}).Info("Starting server with configuration:")
 
 	r := router.NewRouter(config)
 
-	if !config.Server.TLSEnabled {
+	if !config.IsTLSEnabled() {
 		s := makeHTTPServer(r)
-		s.Addr = fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)
+		s.Addr = fmt.Sprintf(config.ListenURL())
 		if err = s.ListenAndServe(); err != nil {
-			log.Fatal(err)
+			log.WithError(err).Fatal("HTTP server exited with error")
 		}
 	}
 
-	if config.Server.TLSEnabled {
+	if config.IsTLSEnabled() {
 		dataDir := "."
 		m := &autocert.Manager{
 			Prompt: autocert.AcceptTOS,
@@ -60,7 +55,7 @@ func main() {
 		}
 
 		s := makeHTTPServer(r)
-		s.Addr = fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)
+		s.Addr = fmt.Sprintf(config.ListenURL())
 		s.TLSConfig = &tls.Config{GetCertificate: m.GetCertificate}
 
 		if err = s.ListenAndServeTLS("", ""); err != nil {
