@@ -9,13 +9,14 @@ import (
 const (
 	defaultTLSEnabled    = false
 	deafultLoggerEnabled = false
-	defaultFaucetEnabled = true
-	defaultMiningEnabled = true
+	defaultFaucetEnabled = false
+	defaultMiningEnabled = false
 
 	defaultAddr        = "localhost:3000"
 	defaultElectrsAddr = "localhost:3002"
 	defaultRPCAddr     = "localhost:19001"
 	defaultRPCCookie   = "admin1:123"
+	defaultChain       = "bitcoin"
 )
 
 // Config type is used to parse flag options
@@ -27,6 +28,7 @@ type Config interface {
 	ListenURL() string
 	RPCServerURL() string
 	ElectrsURL() string
+	Chain() string
 }
 
 type config struct {
@@ -37,6 +39,7 @@ type config struct {
 		loggerEnabled bool
 		host          string
 		port          string
+		chain         string
 	}
 	electrs struct {
 		host string
@@ -52,15 +55,16 @@ type config struct {
 
 // NewConfigFromFlags parses flags and returns a Config
 func NewConfigFromFlags() (Config, error) {
-	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https}")
-	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to true to use faucet")
-	miningEnabled := flag.Bool("use-mining", defaultMiningEnabled, "set to false to disable block mining right after broadcasting requests")
+	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https")
+	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to use faucet")
+	miningEnabled := flag.Bool("use-mining", defaultMiningEnabled, "Set to false to disable block mining right after broadcasting requests")
+	loggerEnabled := flag.Bool("use-logger", deafultLoggerEnabled, "Set true to log every request/response")
 
-	addr := flag.String("addr", defaultAddr, "Listen address")
+	addr := flag.String("addr", defaultAddr, "Chopsticks listen address")
 	electrsAddr := flag.String("electrs-addr", defaultElectrsAddr, "Elctrs HTTP server address")
 	rpcAddr := flag.String("rpc-addr", defaultRPCAddr, "RPC server address")
 	rpcCookie := flag.String("rpc-cookie", defaultRPCCookie, "RPC server user and password")
-	loggerEnabled := flag.Bool("use-logger", deafultLoggerEnabled, "Set true to log every request/response")
+	chain := flag.String("chain", defaultChain, "Set default chain. Eihter 'bitcoin' or 'liquid'")
 	flag.Parse()
 
 	host, port, ok := splitString(*addr)
@@ -94,6 +98,7 @@ func NewConfigFromFlags() (Config, error) {
 	c.server.miningEnabled = *miningEnabled
 	c.server.host = host
 	c.server.port = port
+	c.server.chain = *chain
 
 	c.electrs.host = electrsHost
 	c.electrs.port = electrsPort
@@ -132,6 +137,10 @@ func (c *config) RPCServerURL() string {
 
 func (c *config) ElectrsURL() string {
 	return fmt.Sprintf("http://%s:%s", c.electrs.host, c.electrs.port)
+}
+
+func (c *config) Chain() string {
+	return c.server.chain
 }
 
 func splitString(addr string) (string, string, bool) {
