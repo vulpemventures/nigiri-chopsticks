@@ -8,7 +8,7 @@ import (
 
 const (
 	defaultTLSEnabled    = false
-	deafultLoggerEnabled = false
+	defaultLoggerEnabled = false
 	defaultFaucetEnabled = false
 	defaultMiningEnabled = false
 
@@ -58,7 +58,7 @@ func NewConfigFromFlags() (Config, error) {
 	tlsEnabled := flag.Bool("use-tls", defaultTLSEnabled, "Set true to use https")
 	faucetEnabled := flag.Bool("use-faucet", defaultFaucetEnabled, "Set to use faucet")
 	miningEnabled := flag.Bool("use-mining", defaultMiningEnabled, "Set to false to disable block mining right after broadcasting requests")
-	loggerEnabled := flag.Bool("use-logger", deafultLoggerEnabled, "Set true to log every request/response")
+	loggerEnabled := flag.Bool("use-logger", defaultLoggerEnabled, "Set true to log every request/response")
 
 	addr := flag.String("addr", defaultAddr, "Chopsticks listen address")
 	electrsAddr := flag.String("electrs-addr", defaultElectrsAddr, "Elctrs HTTP server address")
