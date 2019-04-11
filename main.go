@@ -35,6 +35,7 @@ func main() {
 		"listen_url":     config.ListenURL(),
 		"electrs_url":    config.ElectrsURL(),
 		"rpc_server_url": config.RPCServerURL(),
+		"chain":          config.Chain(),
 	}).Info("Starting server with configuration:")
 
 	r := router.NewRouter(config)
