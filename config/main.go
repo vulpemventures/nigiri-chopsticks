@@ -111,6 +111,62 @@ func NewConfigFromFlags() (Config, error) {
 	return c, nil
 }
 
+func NewTestConfig() Config {
+	host, port, _ := splitString(defaultAddr)
+	electrsHost, electrsPort, _ := splitString(defaultElectrsAddr)
+	rpcHost, rpcPort, _ := splitString(defaultRPCAddr)
+	rpcUser, rpcPassword, _ := splitString(defaultRPCCookie)
+
+	c := &config{}
+	c.server.loggerEnabled = defaultLoggerEnabled
+	c.server.tlsEnabled = defaultTLSEnabled
+	c.server.faucetEnabled = true
+	c.server.miningEnabled = true
+	c.server.host = host
+	c.server.port = port
+	c.server.chain = defaultChain
+
+	c.electrs.host = electrsHost
+	c.electrs.port = electrsPort
+
+	c.rpcServer.host = rpcHost
+	c.rpcServer.port = rpcPort
+	c.rpcServer.user = rpcUser
+	c.rpcServer.password = rpcPassword
+
+	return c
+}
+
+func NewTestLiquidConfig() Config {
+	defaultChain := "liquid"
+	defaultRPCAddr := "localhost:18884"
+	defaultElectrsAdrr := "localhost:3022"
+
+	host, port, _ := splitString(defaultAddr)
+	electrsHost, electrsPort, _ := splitString(defaultElectrsAdrr)
+	rpcHost, rpcPort, _ := splitString(defaultRPCAddr)
+	rpcUser, rpcPassword, _ := splitString(defaultRPCCookie)
+
+	c := &config{}
+	c.server.loggerEnabled = defaultLoggerEnabled
+	c.server.tlsEnabled = defaultTLSEnabled
+	c.server.faucetEnabled = true
+	c.server.miningEnabled = true
+	c.server.host = host
+	c.server.port = port
+	c.server.chain = defaultChain
+
+	c.electrs.host = electrsHost
+	c.electrs.port = electrsPort
+
+	c.rpcServer.host = rpcHost
+	c.rpcServer.port = rpcPort
+	c.rpcServer.user = rpcUser
+	c.rpcServer.password = rpcPassword
+
+	return c
+}
+
 func (c *config) IsTLSEnabled() bool {
 	return c.server.tlsEnabled
 }
