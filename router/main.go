@@ -1,6 +1,9 @@
 package router
 
 import (
+	"strings"
+	"time"
+
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
@@ -38,12 +41,15 @@ func NewRouter(config cfg.Config) *Router {
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
 
 		status, blockHashes, err := r.Faucet.Fund()
+		for err != nil && strings.Contains(err.Error(), "Loading") && status == 500 {
+			time.Sleep(2 * time.Second)
+			status, blockHashes, err = r.Faucet.Fund()
+		}
 		if err != nil {
-			log.WithError(err).WithField("status", status).Warning("Could not be able to fund faucet, please do it manually")
-		} else {
-			if len(blockHashes) > 0 {
-				log.WithField("num_blocks", len(blockHashes)).Info("Faucet has been funded mining some blocks")
-			}
+			log.WithField("status", status).WithError(err).Warning("Faucet not funded, check the error")
+		}
+		if len(blockHashes) > 0 {
+			log.WithField("num_blocks", len(blockHashes)).Info("Faucet has been funded mining some blocks")
 		}
 	}
 
