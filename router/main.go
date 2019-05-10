@@ -56,7 +56,7 @@ func NewRouter(config cfg.Config) *Router {
 	if config.IsLoggerEnabled() {
 		r.Use(middleware.Logger)
 	}
-	r.HandleFunc("/broadcast", r.HandleBroadcastRequest).Methods("POST")
+	r.HandleFunc("/tx", r.HandleBroadcastRequest).Methods("POST")
 	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest)
 
 	return r
