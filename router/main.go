@@ -4,14 +4,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/mux"
-	log "github.com/sirupsen/logrus"
 	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
 	"github.com/vulpemventures/nigiri-chopsticks/faucet"
 	"github.com/vulpemventures/nigiri-chopsticks/faucet/liquid"
 	"github.com/vulpemventures/nigiri-chopsticks/faucet/regtest"
 	"github.com/vulpemventures/nigiri-chopsticks/helpers"
 	"github.com/vulpemventures/nigiri-chopsticks/router/middleware"
+	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 // Router extends gorilla Router
