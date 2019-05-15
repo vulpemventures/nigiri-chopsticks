@@ -27,14 +27,15 @@ func (f *liquidfaucet) NewTransaction(address string) (int, string, error) {
 	return status, resp.(string), nil
 }
 
+// liquid starts with initialfreecoins = 21,000,000 LBTC so we just need to
+// "mature" the balance mining 101 blocks if not already mined
 func (f *liquidfaucet) Fund() (int, []string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "getbalance", nil)
+	status, resp, err := handleRPCRequest(f.rpcClient, "getblockcount", nil)
 	if err != nil {
 		return status, nil, err
 	}
 
-	balance := resp.(map[string]interface{})["bitcoin"].(float64)
-	if balance <= 0 {
+	if blockCount := resp.(float64); blockCount <= 0 {
 		status, resp, err := handleRPCRequest(f.rpcClient, "generate", []interface{}{101})
 		if err != nil {
 			return status, nil, err
