@@ -25,7 +25,7 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 		confirmed mining one block and returning the tx hash in the response body
 	*/
 	if r.Config.Chain() == "liquid" {
-		mineOneBlock(r)
+		r.Faucet.Mine(10)
 		json.NewEncoder(res).Encode(map[string]string{"txId": tx})
 		return
 	}
