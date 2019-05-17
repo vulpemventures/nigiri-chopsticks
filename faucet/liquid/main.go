@@ -36,19 +36,24 @@ func (f *liquidfaucet) Fund() (int, []string, error) {
 	}
 
 	if blockCount := resp.(float64); blockCount <= 0 {
-		status, resp, err := handleRPCRequest(f.rpcClient, "generate", []interface{}{101})
-		if err != nil {
-			return status, nil, err
-		}
-
-		blockHashes := []string{}
-		for _, b := range resp.([]interface{}) {
-			blockHashes = append(blockHashes, b.(string))
-		}
-		return status, blockHashes, nil
+		return f.Mine(101)
 	}
 
 	return 200, nil, nil
+}
+
+func (f *liquidfaucet) Mine(blocks int) (int, []string, error) {
+	status, resp, err := handleRPCRequest(f.rpcClient, "generate", []interface{}{blocks})
+	if err != nil {
+		return status, nil, err
+	}
+
+	blockHashes := []string{}
+	for _, b := range resp.([]interface{}) {
+		blockHashes = append(blockHashes, b.(string))
+	}
+
+	return status, blockHashes, nil
 }
 
 func handleRPCRequest(client *helpers.RpcClient, method string, params []interface{}) (int, interface{}, error) {
