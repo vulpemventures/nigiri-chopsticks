@@ -62,19 +62,29 @@ func (f *regtestfaucet) Fund() (int, []string, error) {
 	}
 
 	if balance := resp.(float64); balance <= 0 {
-		status, resp, err := handleRPCRequest(f.rpcClient, "generate", []interface{}{101})
-		if err != nil {
-			return status, nil, err
-		}
-
-		blockHashes := []string{}
-		for _, b := range resp.([]interface{}) {
-			blockHashes = append(blockHashes, b.(string))
-		}
-		return status, blockHashes, nil
+		return f.Mine(101)
 	}
 
 	return 200, nil, nil
+}
+
+func (f *regtestfaucet) Mine(blocks int) (int, []string, error) {
+	status, resp, err := handleRPCRequest(f.rpcClient, "getnewaddress", nil)
+	if err != nil {
+		return status, nil, err
+	}
+	address := resp.(string)
+
+	status, resp, err = handleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{101, address})
+	if err != nil {
+		return status, nil, err
+	}
+
+	blockHashes := []string{}
+	for _, b := range resp.([]interface{}) {
+		blockHashes = append(blockHashes, b.(string))
+	}
+	return status, blockHashes, nil
 }
 
 func handleRPCRequest(client *helpers.RpcClient, method string, params []interface{}) (int, interface{}, error) {
