@@ -7,8 +7,8 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	cfg "github.com/altafan/nigiri-chopsticks/config"
-	"github.com/altafan/nigiri-chopsticks/router"
+	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
+	"github.com/vulpemventures/nigiri-chopsticks/router"
 	"golang.org/x/crypto/acme/autocert"
 )
 
