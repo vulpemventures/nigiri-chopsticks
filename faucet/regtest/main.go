@@ -75,7 +75,7 @@ func (f *regtestfaucet) Mine(blocks int) (int, []string, error) {
 	}
 	address := resp.(string)
 
-	status, resp, err = handleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{101, address})
+	status, resp, err = handleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{blocks, address})
 	if err != nil {
 		return status, nil, err
 	}
