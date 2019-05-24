@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+case $1 in
+  local) addr="localhost";;
+  drone) addr="54.72.215.222";;
+  *) echo "Invalid option. Aborting."; exit 1;;
+esac
+
+PARENT_PATH=$(dirname $(cd $(dirname $0); pwd -P))
+
+pushd $PARENT_PATH
+
+ADDR=$addr go test -v ./...
+
+popd

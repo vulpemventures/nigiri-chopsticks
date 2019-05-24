@@ -1,0 +1,13 @@
+workspace:
+  base: /root
+  path: go/src/github.com/altafan/nigiri-chopsticks
+
+
+pipeline:
+  test:
+    image: golang
+    commands:
+      # Install dep
+      - curl -s https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - bash scripts/install
+      - bash scripts/test drone

@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -161,10 +162,10 @@ func NewTestConfig() Config {
 	c.server.port = "7000"
 	c.server.chain = "bitcoin"
 
-	c.electrs.host = "localhost"
+	c.electrs.host = os.Getenv("ADDR")
 	c.electrs.port = "3002"
 
-	c.rpcServer.host = "localhost"
+	c.rpcServer.host = os.Getenv("ADDR")
 	c.rpcServer.port = "18443"
 	c.rpcServer.user = "admin1"
 	c.rpcServer.password = "123"
@@ -182,10 +183,10 @@ func NewLiquidTestConfig() Config {
 	c.server.port = "7001"
 	c.server.chain = "liquid"
 
-	c.electrs.host = "localhost"
+	c.electrs.host = os.Getenv("ADDR")
 	c.electrs.port = "3022"
 
-	c.rpcServer.host = "localhost"
+	c.rpcServer.host = os.Getenv("ADDR")
 	c.rpcServer.port = "7041"
 	c.rpcServer.user = "admin1"
 	c.rpcServer.password = "123"
