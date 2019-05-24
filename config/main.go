@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -149,4 +150,46 @@ func splitString(addr string) (string, string, bool) {
 	}
 
 	return "", "", false
+}
+
+func NewTestConfig() Config {
+	c := &config{}
+	c.server.tlsEnabled = false
+	c.server.loggerEnabled = false
+	c.server.faucetEnabled = true
+	c.server.miningEnabled = true
+	c.server.host = "localhost"
+	c.server.port = "7000"
+	c.server.chain = "bitcoin"
+
+	c.electrs.host = os.Getenv("ADDR")
+	c.electrs.port = "3002"
+
+	c.rpcServer.host = os.Getenv("ADDR")
+	c.rpcServer.port = "18443"
+	c.rpcServer.user = "admin1"
+	c.rpcServer.password = "123"
+
+	return c
+}
+
+func NewLiquidTestConfig() Config {
+	c := &config{}
+	c.server.tlsEnabled = false
+	c.server.loggerEnabled = false
+	c.server.faucetEnabled = true
+	c.server.miningEnabled = true
+	c.server.host = "localhost"
+	c.server.port = "7001"
+	c.server.chain = "liquid"
+
+	c.electrs.host = os.Getenv("ADDR")
+	c.electrs.port = "3022"
+
+	c.rpcServer.host = os.Getenv("ADDR")
+	c.rpcServer.port = "7041"
+	c.rpcServer.user = "admin1"
+	c.rpcServer.password = "123"
+
+	return c
 }
