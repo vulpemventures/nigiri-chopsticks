@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/altafan/nigiri-chopsticks/faucet"
-	"github.com/altafan/nigiri-chopsticks/helpers"
+	"github.com/vulpemventures/nigiri-chopsticks/faucet"
+	"github.com/vulpemventures/nigiri-chopsticks/helpers"
 )
 
 type liquidfaucet struct {

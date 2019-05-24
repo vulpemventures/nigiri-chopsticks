@@ -3,7 +3,7 @@ package router
 import (
 	"testing"
 
-	"github.com/altafan/nigiri-chopsticks/config"
+	"github.com/vulpemventures/nigiri-chopsticks/config"
 )
 
 func NewTestRouter(liquid bool) *Router {
