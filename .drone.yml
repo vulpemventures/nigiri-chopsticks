@@ -7,7 +7,7 @@ pipeline:
   test:
     image: golang
     commands:
-      # Install dep
+      - mkdir -p /go/bin
       - curl -s https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
       - bash scripts/install
       - bash scripts/test drone
