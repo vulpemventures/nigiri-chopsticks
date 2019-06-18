@@ -43,7 +43,13 @@ func (f *liquidfaucet) Fund() (int, []string, error) {
 }
 
 func (f *liquidfaucet) Mine(blocks int) (int, []string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "generate", []interface{}{blocks})
+	status, resp, err := handleRPCRequest(f.rpcClient, "getnewaddress", nil)
+	if err != nil {
+		return status, nil, err
+	}
+	address := resp.(string)
+
+	status, resp, err = handleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{blocks, address})
 	if err != nil {
 		return status, nil, err
 	}
