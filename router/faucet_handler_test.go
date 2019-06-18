@@ -98,7 +98,7 @@ func TestLiquidFaucetBadRequestShouldFail(t *testing.T) {
 	}
 
 	err := resp.Body.String()
-	expectedError := "Invalid Bitcoin address"
+	expectedError := "Invalid address"
 	if !strings.Contains(err, expectedError) {
 		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
 	}

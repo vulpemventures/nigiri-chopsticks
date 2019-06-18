@@ -128,7 +128,7 @@ func blindRawTransaction(r *helpers.RpcClient, txHex string) (string, error) {
 }
 
 func signRawTransaction(r *helpers.RpcClient, txHex string) (string, error) {
-	_, resp, err := handleRPCRequest(r, "signrawtransaction", []interface{}{txHex})
+	_, resp, err := handleRPCRequest(r, "signrawtransactionwithwallet", []interface{}{txHex})
 	if err != nil {
 		return "", err
 	}
