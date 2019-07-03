@@ -40,6 +40,11 @@ nigiri-chopsticks $ ./build/nigiri-chopsticks-darwin-amd64
 The web server starts at default address `localhost:3000` with the following routes:
 
 * `/faucet` if faucet is enabled, to send funds to an address
+  * example: 
+  ```
+  $ curl -X POST --data '{"address": "2MsnWskyHaHvcZUHA4gnR3G95EnUmZQjzM8"}' http://localhost:3000/faucet`
+  142a3ef44ddb3f9f395bcd87d73d71ccc8d90566a219f8d57ff0a71822617413
+  ```
 * all [esplora](https://github.com/blockstream/esplora/blob/master/API.md) HTTP API endpoints
 
 **Note:**  
