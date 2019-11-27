@@ -11,6 +11,8 @@ import (
 // retrieving the signed transaction from the faucet and broadcasting via the
 // electrs broadcast endpoint
 func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Access-Control-Allow-Methods", "POST")
+
 	body := parseRequestBody(req.Body)
 
 	status, tx, err := r.Faucet.NewTransaction(body["address"])
