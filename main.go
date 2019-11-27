@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -12,11 +11,12 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func makeHTTPServer(handler http.Handler) *http.Server {
+func makeHTTPServer(handler http.Handler, addr string) *http.Server {
 	return &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		IdleTimeout:  120 * time.Second,
+		Addr:         addr,
 		Handler:      handler,
 	}
 }
@@ -39,24 +39,19 @@ func main() {
 	}).Info("Starting server with configuration:")
 
 	r := router.NewRouter(config)
+	s := makeHTTPServer(r, config.ListenURL())
 
 	if !config.IsTLSEnabled() {
-		s := makeHTTPServer(r)
-		s.Addr = fmt.Sprintf(config.ListenURL())
 		if err = s.ListenAndServe(); err != nil {
 			log.WithError(err).Fatal("HTTP server exited with error")
 		}
-	}
-
-	if config.IsTLSEnabled() {
+	} else {
 		dataDir := "."
 		m := &autocert.Manager{
 			Prompt: autocert.AcceptTOS,
 			Cache:  autocert.DirCache(dataDir),
 		}
 
-		s := makeHTTPServer(r)
-		s.Addr = fmt.Sprintf(config.ListenURL())
 		s.TLSConfig = &tls.Config{GetCertificate: m.GetCertificate}
 
 		if err = s.ListenAndServeTLS("", ""); err != nil {
