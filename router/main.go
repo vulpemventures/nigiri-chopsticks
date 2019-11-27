@@ -4,12 +4,12 @@ import (
 	"strings"
 	"time"
 
-	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
-	"github.com/vulpemventures/nigiri-chopsticks/faucet"
-	"github.com/vulpemventures/nigiri-chopsticks/faucet/liquid"
-	"github.com/vulpemventures/nigiri-chopsticks/faucet/regtest"
-	"github.com/vulpemventures/nigiri-chopsticks/helpers"
-	"github.com/vulpemventures/nigiri-chopsticks/router/middleware"
+	cfg "github.com/altafan/nigiri-chopsticks/config"
+	"github.com/altafan/nigiri-chopsticks/faucet"
+	"github.com/altafan/nigiri-chopsticks/faucet/liquid"
+	"github.com/altafan/nigiri-chopsticks/faucet/regtest"
+	"github.com/altafan/nigiri-chopsticks/helpers"
+	"github.com/altafan/nigiri-chopsticks/router/middleware"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/vulpemventures/nigiri-chopsticks/helpers"
+	"github.com/altafan/nigiri-chopsticks/helpers"
 )
 
 func TestBroadcastLiquidTransaction(t *testing.T) {

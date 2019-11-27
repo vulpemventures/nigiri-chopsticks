@@ -1,6 +1,6 @@
 workspace:
   base: /go
-  path: src/github.com/vulpemventures/nigiri-chopsticks
+  path: src/github.com/altafan/nigiri-chopsticks
 
 
 pipeline:
