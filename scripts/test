@@ -4,7 +4,7 @@ set -e
 
 case $1 in
   local) addr="localhost";;
-  drone) addr="54.72.215.222";;
+  drone) addr="52.211.21.65";;
   *) echo "Invalid option. Aborting."; exit 1;;
 esac
 
