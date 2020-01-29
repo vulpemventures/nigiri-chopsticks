@@ -43,11 +43,18 @@ func (f *liquidfaucet) Fund() (int, []string, error) {
 }
 
 func (f *liquidfaucet) Mine(blocks int) (int, []string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "getnewaddress", nil)
+	status, resp, err := handleRPCRequest(f.rpcClient, "getnewaddress", []interface{}{"", "legacy"})
 	if err != nil {
 		return status, nil, err
 	}
-	address := resp.(string)
+	confidentialAddress := resp.(string)
+
+	status, resp, err = handleRPCRequest(f.rpcClient, "validateaddress", []interface{}{confidentialAddress})
+	if err != nil {
+		return status, nil, err
+	}
+	unmarshaledResp := resp.(map[string]interface{})
+	address := unmarshaledResp["unconfidential"]
 
 	status, resp, err = handleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{blocks, address})
 	if err != nil {
