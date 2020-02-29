@@ -13,4 +13,4 @@ RUN go build -tags netgo -a -o /go/bin/app
 # Now copy it into our base image.
 FROM alpine:latest
 COPY --from=build /go/bin/app /
-CMD ["/app"]
+ENTRYPOINT ["/app"]
