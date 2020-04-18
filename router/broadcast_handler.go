@@ -11,11 +11,7 @@ func (r *Router) HandleBroadcastRequest(res http.ResponseWriter, req *http.Reque
 	r.HandleElectrsRequest(res, req)
 
 	if r.Config.IsMiningEnabled() {
-		blocks := 1
-		if r.Config.Chain() == "liquid" {
-			blocks = 10
-		}
-		status, blockHashes, err := r.Faucet.Mine(blocks)
+		status, blockHashes, err := r.Faucet.Mine(1)
 		if err != nil {
 			log.WithError(err).WithField("status", status).Warning("An unexpected error occured while mining blocks")
 		} else {
