@@ -2,7 +2,6 @@ package faucet
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/vulpemventures/nigiri-chopsticks/helpers"
@@ -62,20 +61,23 @@ func (f *Faucet) Mine(blocks int) (int, []string, error) {
 	return status, blockHashes, nil
 }
 
-func (f *Faucet) Mint(address string, quantity float64) (int, string, error) {
+func (f *Faucet) Mint(address string, quantity float64) (int, map[string]string, error) {
 	status, resp, err := handleRPCRequest(f.rpcClient, "issueasset", []interface{}{quantity, 0, false})
 	if err != nil {
-		return status, "", err
+		return status, nil, err
 	}
 	asset := resp.(map[string]interface{})["asset"].(string)
 
 	status, tx, err := handleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, quantity, "", "", false, false, 1, "UNSET", asset})
 	if err != nil {
-		return status, "", err
+		return status, nil, err
 	}
 
-	resp = fmt.Sprintf(`{"asset": %s, "txId": %s}`, asset, tx.(string))
-	return status, resp.(string), nil
+	res := make(map[string]string)
+	res["asset"] = asset
+	res["txId"] = tx.(string)
+
+	return status, res, nil
 }
 
 func handleRPCRequest(client *helpers.RpcClient, method string, params []interface{}) (int, interface{}, error) {
