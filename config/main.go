@@ -166,7 +166,7 @@ func NewTestConfig() Config {
 	c.electrs.port = "3002"
 
 	c.rpcServer.host = os.Getenv("ADDR")
-	c.rpcServer.port = "18443"
+	c.rpcServer.port = "18433"
 	c.rpcServer.user = "admin1"
 	c.rpcServer.password = "123"
 
@@ -184,7 +184,7 @@ func NewLiquidTestConfig() Config {
 	c.server.chain = "liquid"
 
 	c.electrs.host = os.Getenv("ADDR")
-	c.electrs.port = "3022"
+	c.electrs.port = "3012"
 
 	c.rpcServer.host = os.Getenv("ADDR")
 	c.rpcServer.port = "7041"
