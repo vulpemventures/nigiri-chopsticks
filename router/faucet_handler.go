@@ -36,7 +36,7 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 	address := body["address"].(string)
 	quantity := body["quantity"].(float64)
 
-	status, tx, err := r.Faucet.Mint(address, quantity)
+	status, resp, err := r.Faucet.Mint(address, quantity)
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
@@ -44,7 +44,7 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 
 	if r.Config.IsMiningEnabled() {
 		r.Faucet.Mine(1)
-		json.NewEncoder(res).Encode(map[string]string{"txId": tx})
+		json.NewEncoder(res).Encode(resp)
 	}
 	return
 }

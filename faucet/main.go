@@ -2,6 +2,7 @@ package faucet
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/vulpemventures/nigiri-chopsticks/helpers"
@@ -68,10 +69,12 @@ func (f *Faucet) Mint(address string, quantity float64) (int, string, error) {
 	}
 	asset := resp.(map[string]interface{})["asset"].(string)
 
-	status, resp, err = handleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, quantity, "", "", false, false, 1, "UNSET", asset})
+	status, tx, err := handleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, quantity, "", "", false, false, 1, "UNSET", asset})
 	if err != nil {
 		return status, "", err
 	}
+
+	resp = fmt.Sprintf(`{"asset": %s, "txId": %s}`, asset, tx.(string))
 	return status, resp.(string), nil
 }
 
