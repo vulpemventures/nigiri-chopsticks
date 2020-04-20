@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -15,31 +14,44 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 
 	body := parseRequestBody(req.Body)
 
-	status, tx, err := r.Faucet.NewTransaction(body["address"])
+	status, tx, err := r.Faucet.NewTransaction(body["address"].(string))
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
 	}
 
-	/*
-		since the liquid implementation of Faucet uses the sendtoaddress RPC method,
-		it already returns the hash of the transaction, then we just need to get it
-		confirmed mining one block and returning the tx hash in the response body
-	*/
-	if r.Config.Chain() == "liquid" {
-		r.Faucet.Mine(10)
+	if r.Config.IsMiningEnabled() {
+		r.Faucet.Mine(1)
 		json.NewEncoder(res).Encode(map[string]string{"txId": tx})
+	}
+	return
+}
+
+// HandleMintRequest is a Liquid only endpoint that issues a requested quantity
+// of a new asset and sends it to the requested address
+func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Access-Control-Allow-Methods", "POST")
+
+	body := parseRequestBody(req.Body)
+	address := body["address"].(string)
+	quantity := body["quantity"].(float64)
+
+	status, resp, err := r.Faucet.Mint(address, quantity)
+	if err != nil {
+		http.Error(res, err.Error(), status)
 		return
 	}
 
-	broadcastRequest, _ := http.NewRequest("GET", fmt.Sprintf("%s/broadcast?tx=%s", r.Config.ElectrsURL(), tx), nil)
-
-	r.HandleBroadcastRequest(res, broadcastRequest)
+	if r.Config.IsMiningEnabled() {
+		r.Faucet.Mine(1)
+		json.NewEncoder(res).Encode(resp)
+	}
+	return
 }
 
-func parseRequestBody(body io.ReadCloser) map[string]string {
+func parseRequestBody(body io.ReadCloser) map[string]interface{} {
 	decoder := json.NewDecoder(body)
-	var decodedBody map[string]string
+	var decodedBody map[string]interface{}
 	decoder.Decode(&decodedBody)
 
 	return decodedBody

@@ -40,7 +40,7 @@ func TestBroadcastLiquidTransaction(t *testing.T) {
 	}
 	blockCount, _ := strconv.Atoi(blockCountResp.Body.String())
 	blockMined := blockCount - prevBlockCount
-	if blockMined != 10 {
+	if blockMined != 1 {
 		t.Fatalf("Expected 1 block mined, got %d\n", blockMined)
 	}
 }

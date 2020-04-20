@@ -17,6 +17,8 @@ const (
 	badBtcAddress    = ""
 	liquidAddress    = "CTEsqL1x9ooWWG9HBaHUpvS2DGJJ4haYdkTQPKj9U8CCdwT5vcudhbYUT8oQwwoS11aYtdznobfgT8rj"
 	badLiquidAddress = ""
+	assetQuantity    = 1000
+	badAssetQuantity = -1
 )
 
 func TestBitcoinFaucet(t *testing.T) {
@@ -56,7 +58,7 @@ func TestBitcoinFaucetBadRequestShouldFail(t *testing.T) {
 	}
 
 	err := resp.Body.String()
-	expectedError := "Invalid Bitcoin address"
+	expectedError := "Invalid address"
 	if !strings.Contains(err, expectedError) {
 		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
 	}
@@ -84,7 +86,20 @@ func TestLiquidFaucet(t *testing.T) {
 	}
 	blockCount, _ := strconv.Atoi(blockCountResp.Body.String())
 	blockMined := blockCount - prevBlockCount
-	if blockMined != 10 {
+	if blockMined != 1 {
+		t.Fatalf("Expected 1 block mined, got %d\n", blockMined)
+	}
+	prevBlockCount, _ = strconv.Atoi(blockCountResp.Body.String())
+
+	resp = mintRequest(r, liquidAddress, assetQuantity)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("Expected status %d, got: %d\n", http.StatusOK, resp.Code)
+	}
+	time.Sleep(5 * time.Second)
+	blockCountResp = blockCountRequest(r)
+	blockCount, _ = strconv.Atoi(blockCountResp.Body.String())
+	blockMined = blockCount - prevBlockCount
+	if blockMined != 1 {
 		t.Fatalf("Expected 1 block mined, got %d\n", blockMined)
 	}
 }
@@ -102,6 +117,27 @@ func TestLiquidFaucetBadRequestShouldFail(t *testing.T) {
 	if !strings.Contains(err, expectedError) {
 		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
 	}
+
+	resp = mintRequest(r, badLiquidAddress, assetQuantity)
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err = resp.Body.String()
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
+
+	resp = mintRequest(r, liquidAddress, badAssetQuantity)
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err = resp.Body.String()
+	expectedError = "Amount out of range"
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
 }
 
 func faucetRequest(r *Router, address string) *httptest.ResponseRecorder {
@@ -113,6 +149,12 @@ func faucetRequest(r *Router, address string) *httptest.ResponseRecorder {
 
 func blockCountRequest(r *Router) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest("GET", "/blocks/tip/height", nil)
+	return doRequest(r, req)
+}
+
+func mintRequest(r *Router, address string, quantity int) *httptest.ResponseRecorder {
+	payload := []byte(fmt.Sprintf(`{"address": "%s", "quantity": %d}`, address, quantity))
+	req, _ := http.NewRequest("POST", "/mint", bytes.NewBuffer(payload))
 	return doRequest(r, req)
 }
 

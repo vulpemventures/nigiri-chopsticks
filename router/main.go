@@ -4,14 +4,12 @@ import (
 	"strings"
 	"time"
 
-	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
-	"github.com/vulpemventures/nigiri-chopsticks/faucet"
-	"github.com/vulpemventures/nigiri-chopsticks/faucet/liquid"
-	"github.com/vulpemventures/nigiri-chopsticks/faucet/regtest"
-	"github.com/vulpemventures/nigiri-chopsticks/helpers"
-	"github.com/vulpemventures/nigiri-chopsticks/router/middleware"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
+	"github.com/vulpemventures/nigiri-chopsticks/faucet"
+	"github.com/vulpemventures/nigiri-chopsticks/helpers"
+	"github.com/vulpemventures/nigiri-chopsticks/router/middleware"
 )
 
 // Router extends gorilla Router
@@ -19,12 +17,7 @@ type Router struct {
 	*mux.Router
 	Config    cfg.Config
 	RPCClient *helpers.RpcClient
-	Faucet    faucet.Faucet
-}
-
-var faucets = map[string]func(chain string, client *helpers.RpcClient) faucet.Faucet{
-	"bitcoin": regtestfaucet.NewFaucet,
-	"liquid":  liquidfaucet.NewFaucet,
+	Faucet    *faucet.Faucet
 }
 
 // NewRouter returns a new Router instance
@@ -35,10 +28,12 @@ func NewRouter(config cfg.Config) *Router {
 	r := &Router{router, config, rpcClient, nil}
 
 	if r.Config.IsFaucetEnabled() {
-		url := r.Config.RPCServerURL()
-		chain := r.Config.Chain()
-		r.Faucet = faucets[chain](url, rpcClient)
+		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
+		r.Faucet = faucet
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
+		if config.Chain() == "liquid" {
+			r.HandleFunc("/mint", r.HandleMintRequest).Methods("POST")
+		}
 
 		status, blockHashes, err := r.Faucet.Fund()
 		for err != nil && strings.Contains(err.Error(), "Loading") && status == 500 {
