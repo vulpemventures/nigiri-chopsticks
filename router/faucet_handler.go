@@ -13,8 +13,13 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 	res.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	body := parseRequestBody(req.Body)
+	address, ok := body["address"]
+	if !ok {
+		http.Error(res, "Malformed Request", http.StatusBadRequest)
+		return
+	}
 
-	status, tx, err := r.Faucet.NewTransaction(body["address"].(string))
+	status, tx, err := r.Faucet.NewTransaction(address.(string))
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
@@ -33,10 +38,18 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	body := parseRequestBody(req.Body)
-	address := body["address"].(string)
-	quantity := body["quantity"].(float64)
+	address, ok := body["address"]
+	if !ok {
+		http.Error(res, "Malformed Request", http.StatusBadRequest)
+		return
+	}
+	quantity, ok := body["quantity"]
+	if !ok {
+		http.Error(res, "Malformed Request", http.StatusBadRequest)
+		return
+	}
 
-	status, resp, err := r.Faucet.Mint(address, quantity)
+	status, resp, err := r.Faucet.Mint(address.(string), quantity.(float64))
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
