@@ -62,6 +62,17 @@ func TestBitcoinFaucetBadRequestShouldFail(t *testing.T) {
 	if !strings.Contains(err, expectedError) {
 		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
 	}
+
+	resp = faucetBadRequest(r)
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err = resp.Body.String()
+	expectedError = "Malformed Request"
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
 }
 
 func TestLiquidFaucet(t *testing.T) {
@@ -138,10 +149,50 @@ func TestLiquidFaucetBadRequestShouldFail(t *testing.T) {
 	if !strings.Contains(err, expectedError) {
 		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
 	}
+
+	resp = faucetBadRequest(r)
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err = resp.Body.String()
+	expectedError = "Malformed Request"
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
+
+	resp = mintBadRequest(r, "", assetQuantity)
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err = resp.Body.String()
+	expectedError = "Malformed Request"
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
+
+	resp = mintBadRequest(r, liquidAddress, 0)
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err = resp.Body.String()
+	expectedError = "Malformed Request"
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
 }
 
 func faucetRequest(r *Router, address string) *httptest.ResponseRecorder {
 	payload := []byte(fmt.Sprintf(`{"address": "%s"}`, address))
+	req, _ := http.NewRequest("POST", "/faucet", bytes.NewBuffer(payload))
+
+	return doRequest(r, req)
+}
+
+func faucetBadRequest(r *Router) *httptest.ResponseRecorder {
+	payload := []byte(fmt.Sprintf("{}"))
 	req, _ := http.NewRequest("POST", "/faucet", bytes.NewBuffer(payload))
 
 	return doRequest(r, req)
@@ -152,8 +203,19 @@ func blockCountRequest(r *Router) *httptest.ResponseRecorder {
 	return doRequest(r, req)
 }
 
-func mintRequest(r *Router, address string, quantity int) *httptest.ResponseRecorder {
-	payload := []byte(fmt.Sprintf(`{"address": "%s", "quantity": %d}`, address, quantity))
+func mintRequest(r *Router, address string, quantity float64) *httptest.ResponseRecorder {
+	payload := []byte(fmt.Sprintf(`{"address": "%s", "quantity": %f}`, address, quantity))
+	req, _ := http.NewRequest("POST", "/mint", bytes.NewBuffer(payload))
+	return doRequest(r, req)
+}
+
+func mintBadRequest(r *Router, address string, quantity float64) *httptest.ResponseRecorder {
+	payload := []byte(fmt.Sprintf(`{"address": "%s", "quantity": %f}`, address, quantity))
+	if address == "" {
+		payload = []byte(fmt.Sprintf(`{"quantity": %f}`, quantity))
+	} else {
+		payload = []byte(fmt.Sprintf(`{"address": %s}`, address))
+	}
 	req, _ := http.NewRequest("POST", "/mint", bytes.NewBuffer(payload))
 	return doRequest(r, req)
 }
