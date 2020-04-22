@@ -1,0 +1,24 @@
+language: go
+
+go:
+  - 1.13.x
+
+env:
+  - GO111MODULE=on
+
+services:
+  - docker
+
+before_install:
+  - curl https://travis.nigiri.network | bash
+  - docker-compose up -d;
+
+install:
+  - bash scripts/install
+
+script:
+  - bash scripts/test ci;
+  - bash scripts/build linux amd64;
+
+after_script:
+  - docker-compose down

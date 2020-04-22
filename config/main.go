@@ -154,6 +154,11 @@ func splitString(addr string) (string, string, bool) {
 
 func NewTestConfig() Config {
 	c := &config{}
+	rpcPort := "18433"
+	if os.Getenv("CI") == "true" {
+		rpcPort = "18443"
+	}
+
 	c.server.tlsEnabled = false
 	c.server.loggerEnabled = false
 	c.server.faucetEnabled = true
@@ -162,11 +167,11 @@ func NewTestConfig() Config {
 	c.server.port = "7000"
 	c.server.chain = "bitcoin"
 
-	c.electrs.host = os.Getenv("ADDR")
+	c.electrs.host = "localhost"
 	c.electrs.port = "3002"
 
-	c.rpcServer.host = os.Getenv("ADDR")
-	c.rpcServer.port = "18433"
+	c.rpcServer.host = "localhost"
+	c.rpcServer.port = rpcPort
 	c.rpcServer.user = "admin1"
 	c.rpcServer.password = "123"
 
@@ -175,6 +180,11 @@ func NewTestConfig() Config {
 
 func NewLiquidTestConfig() Config {
 	c := &config{}
+	rpcPort := "7041"
+	if os.Getenv("CI") == "true" {
+		rpcPort = "18884"
+	}
+
 	c.server.tlsEnabled = false
 	c.server.loggerEnabled = false
 	c.server.faucetEnabled = true
@@ -183,11 +193,11 @@ func NewLiquidTestConfig() Config {
 	c.server.port = "7001"
 	c.server.chain = "liquid"
 
-	c.electrs.host = os.Getenv("ADDR")
+	c.electrs.host = "localhost"
 	c.electrs.port = "3012"
 
-	c.rpcServer.host = os.Getenv("ADDR")
-	c.rpcServer.port = "7041"
+	c.rpcServer.host = "localhost"
+	c.rpcServer.port = rpcPort
 	c.rpcServer.user = "admin1"
 	c.rpcServer.password = "123"
 

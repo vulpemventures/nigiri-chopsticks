@@ -3,7 +3,8 @@
 set -e
 
 case $1 in
-  local) addr="localhost";;
+  local) ci="false";;
+  ci) ci="true";;
   *) echo "Invalid option. Aborting."; exit 1;;
 esac
 
@@ -11,6 +12,6 @@ PARENT_PATH=$(dirname $(cd $(dirname $0); pwd -P))
 
 pushd $PARENT_PATH
 
-ADDR=$addr go test -v ./...
+CI=$ci go test -v ./...
 
 popd
