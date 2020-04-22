@@ -48,12 +48,10 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Malformed Request", http.StatusBadRequest)
 		return
 	}
-	contract := body["contract"]
-	if contract != nil {
-		c := contract.(map[string]interface{})
-		name := c["name"]
-		ticker := c["ticker"]
-		if name == nil || ticker == nil {
+	name := body["name"]
+	ticker := body["ticker"]
+	if name != nil || ticker != nil {
+		if ticker == nil || name == nil {
 			http.Error(res, "Malformed Request", http.StatusBadRequest)
 			return
 		}
@@ -65,8 +63,12 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if contract != nil {
-		r.Registry.AddEntry(resp["asset"].(string), resp["issuance_txin"].(map[string]interface{}), contract.(map[string]interface{}))
+	if name != nil {
+		contract := map[string]interface{}{
+			"name":   name,
+			"ticker": ticker,
+		}
+		r.Registry.AddEntry(resp["asset"].(string), resp["issuance_txin"].(map[string]interface{}), contract)
 	}
 
 	if r.Config.IsMiningEnabled() {

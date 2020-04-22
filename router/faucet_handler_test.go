@@ -21,19 +21,8 @@ const (
 	badLiquidAddress = ""
 	assetQuantity    = 1000
 	badAssetQuantity = -1
-)
-
-var (
-	contract = map[string]string{
-		"name":   "test",
-		"ticker": "TST",
-	}
-	badContract1 = map[string]string{
-		"name": "test",
-	}
-	badContract2 = map[string]string{
-		"ticker": "TST",
-	}
+	name             = "test"
+	ticker           = "TST"
 )
 
 func TestBitcoinFaucet(t *testing.T) {
@@ -101,7 +90,7 @@ func TestLiquidFaucet(t *testing.T) {
 	}
 	prevBlockCount, _ = strconv.Atoi(blockCountResp.Body.String())
 
-	resp = mintRequest(r, liquidAddress, assetQuantity, contract)
+	resp = mintRequest(r, liquidAddress, assetQuantity, name, ticker)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("Expected status %d, got: %d\n", http.StatusOK, resp.Code)
 	}
@@ -123,25 +112,25 @@ func TestLiquidFaucetShouldFail(t *testing.T) {
 	resp = faucetRequest(r, badLiquidAddress)
 	checkFailed(t, resp, "Invalid address")
 
-	resp = mintRequest(r, nil, assetQuantity, nil)
+	resp = mintRequest(r, nil, assetQuantity, nil, nil)
 	checkFailed(t, resp, "Malformed Request")
 
-	resp = mintRequest(r, liquidAddress, nil, nil)
+	resp = mintRequest(r, liquidAddress, nil, nil, nil)
 	checkFailed(t, resp, "Malformed Request")
 
-	resp = mintRequest(r, badLiquidAddress, assetQuantity, nil)
+	resp = mintRequest(r, badLiquidAddress, assetQuantity, nil, nil)
 	checkFailed(t, resp, "Invalid address")
 
-	resp = mintRequest(r, liquidAddress, badAssetQuantity, nil)
+	resp = mintRequest(r, liquidAddress, badAssetQuantity, nil, nil)
 	checkFailed(t, resp, "Amount out of range")
 
-	resp = mintRequest(r, liquidAddress, assetQuantity, badContract1)
+	resp = mintRequest(r, liquidAddress, assetQuantity, name, nil)
 	checkFailed(t, resp, "Malformed Request")
 
-	resp = mintRequest(r, liquidAddress, assetQuantity, badContract2)
+	resp = mintRequest(r, liquidAddress, assetQuantity, nil, name)
 	checkFailed(t, resp, "Malformed Request")
 
-	os.Remove(filepath.Join(r.Config.RegistryPath(), "registry.json"))
+	os.RemoveAll(filepath.Join(r.Config.RegistryPath(), "registry"))
 }
 
 func faucetRequest(r *Router, address interface{}) *httptest.ResponseRecorder {
@@ -159,11 +148,12 @@ func blockCountRequest(r *Router) *httptest.ResponseRecorder {
 	return doRequest(r, req)
 }
 
-func mintRequest(r *Router, address, quantity, contract interface{}) *httptest.ResponseRecorder {
+func mintRequest(r *Router, address, quantity, name, ticker interface{}) *httptest.ResponseRecorder {
 	request := map[string]interface{}{
 		"address":  address,
 		"quantity": quantity,
-		"contract": contract,
+		"name":     name,
+		"ticker":   ticker,
 	}
 	payload, _ := json.Marshal(request)
 
