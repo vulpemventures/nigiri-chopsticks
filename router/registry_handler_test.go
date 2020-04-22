@@ -25,6 +25,12 @@ func TestRegistry(t *testing.T) {
 	if len(list) < 1 {
 		t.Fatalf("Expected entry list to not be empty")
 	}
+}
+
+func TestRegistryShouldFail(t *testing.T) {
+	r := NewTestRouter(withLiquid)
+	resp := registryRequest(r, nil)
+	checkFailed(t, resp, "Malformed Request")
 
 	os.RemoveAll(filepath.Join(r.Config.RegistryPath(), "registry"))
 }
