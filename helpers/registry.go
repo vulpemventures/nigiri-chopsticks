@@ -49,7 +49,7 @@ func (r *Registry) AddEntry(asset string, issuanceInput map[string]interface{}, 
 }
 
 // GetEntry returns and entry if it exist in registry or NIL
-func (r *Registry) GetEntry(asset string) (interface{}, error) {
+func (r *Registry) GetEntry(asset string) (map[string]interface{}, error) {
 	entry := map[string]interface{}{}
 	err := r.db.Read("registry", asset, &entry)
 	if err != nil {
@@ -59,8 +59,8 @@ func (r *Registry) GetEntry(asset string) (interface{}, error) {
 	return entry, nil
 }
 
-func (r *Registry) GetEntries(assets []interface{}) ([]interface{}, error) {
-	entries := []interface{}{}
+func (r *Registry) GetEntries(assets []interface{}) ([]map[string]interface{}, error) {
+	entries := []map[string]interface{}{}
 
 	if len(assets) == 0 {
 		records, err := r.db.ReadAll("registry")
@@ -69,13 +69,13 @@ func (r *Registry) GetEntries(assets []interface{}) ([]interface{}, error) {
 		}
 
 		for _, f := range records {
-			var entry interface{}
+			entry := map[string]interface{}{}
 			json.Unmarshal([]byte(f), &entry)
 			entries = append(entries, entry)
 		}
 	} else {
 		for _, asset := range assets {
-			var entry interface{}
+			entry := map[string]interface{}{}
 			r.db.Read("registry", asset.(string), &entry)
 			entries = append(entries, entry)
 		}
