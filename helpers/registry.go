@@ -3,7 +3,6 @@ package helpers
 import (
 	"encoding/json"
 	"errors"
-	"os"
 	"strings"
 
 	"github.com/sdomino/scribble"
@@ -52,7 +51,8 @@ func (r *Registry) AddEntry(asset string, issuanceInput map[string]interface{}, 
 func (r *Registry) GetEntry(asset string) (map[string]interface{}, error) {
 	entry := map[string]interface{}{}
 	err := r.db.Read("registry", asset, &entry)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
+
 		return nil, err
 	}
 
@@ -82,32 +82,4 @@ func (r *Registry) GetEntries(assets []interface{}) ([]map[string]interface{}, e
 	}
 
 	return entries, nil
-}
-
-func (r *Registry) load() (map[string]interface{}, error) {
-	file, err := os.OpenFile("registry.json", os.O_RDONLY|os.O_CREATE, 0755)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	data := map[string]interface{}{}
-
-	decoder.Decode(&data)
-
-	return data, nil
-}
-
-func (r *Registry) save(payload map[string]interface{}) error {
-	file, err := os.OpenFile("registry.json", os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "   ")
-	encoder.Encode(payload)
-	return nil
 }
