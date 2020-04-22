@@ -33,8 +33,10 @@ func NewRouter(config cfg.Config) *Router {
 		r.Faucet = faucet
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
 		if config.Chain() == "liquid" {
-			r.Registry = helpers.NewRegistry(config.RegistryPath())
+			registry, _ := helpers.NewRegistry(config.RegistryPath())
+			r.Registry = registry
 			r.HandleFunc("/mint", r.HandleMintRequest).Methods("POST")
+			r.HandleFunc("/registry", r.HandleRegistryRequest).Methods("POST")
 		}
 
 		status, blockHashes, err := r.Faucet.Fund()
