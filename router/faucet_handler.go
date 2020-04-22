@@ -13,8 +13,8 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 	res.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	body := parseRequestBody(req.Body)
-	address, ok := body["address"]
-	if !ok {
+	address := body["address"]
+	if address == nil {
 		http.Error(res, "Malformed Request", http.StatusBadRequest)
 		return
 	}
@@ -38,21 +38,35 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	body := parseRequestBody(req.Body)
-	address, ok := body["address"]
-	if !ok {
+	address := body["address"]
+	if address == nil {
 		http.Error(res, "Malformed Request", http.StatusBadRequest)
 		return
 	}
-	quantity, ok := body["quantity"]
-	if !ok {
+	quantity := body["quantity"]
+	if quantity == nil {
 		http.Error(res, "Malformed Request", http.StatusBadRequest)
 		return
+	}
+	contract := body["contract"]
+	if contract != nil {
+		c := contract.(map[string]interface{})
+		name := c["name"]
+		ticker := c["ticker"]
+		if name == nil || ticker == nil {
+			http.Error(res, "Malformed Request", http.StatusBadRequest)
+			return
+		}
 	}
 
 	status, resp, err := r.Faucet.Mint(address.(string), quantity.(float64))
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
+	}
+
+	if contract != nil {
+		r.Registry.AddEntry(resp["asset"].(string), resp["issuance_txin"].(map[string]interface{}), contract.(map[string]interface{}))
 	}
 
 	if r.Config.IsMiningEnabled() {

@@ -18,6 +18,7 @@ type Router struct {
 	Config    cfg.Config
 	RPCClient *helpers.RpcClient
 	Faucet    *faucet.Faucet
+	Registry  *helpers.Registry
 }
 
 // NewRouter returns a new Router instance
@@ -25,13 +26,14 @@ func NewRouter(config cfg.Config) *Router {
 	router := mux.NewRouter().StrictSlash(true)
 	rpcClient, _ := helpers.NewRpcClient(config.RPCServerURL(), false, 10)
 
-	r := &Router{router, config, rpcClient, nil}
+	r := &Router{router, config, rpcClient, nil, nil}
 
 	if r.Config.IsFaucetEnabled() {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
 		r.Faucet = faucet
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
 		if config.Chain() == "liquid" {
+			r.Registry = helpers.NewRegistry(config.RegistryPath())
 			r.HandleFunc("/mint", r.HandleMintRequest).Methods("POST")
 		}
 

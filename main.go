@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
 	"github.com/vulpemventures/nigiri-chopsticks/router"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/acme/autocert"
 )
 
