@@ -2,9 +2,11 @@ package router
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -19,6 +21,19 @@ const (
 	badLiquidAddress = ""
 	assetQuantity    = 1000
 	badAssetQuantity = -1
+)
+
+var (
+	contract = map[string]string{
+		"name":   "test",
+		"ticker": "TST",
+	}
+	badContract1 = map[string]string{
+		"name": "test",
+	}
+	badContract2 = map[string]string{
+		"ticker": "TST",
+	}
 )
 
 func TestBitcoinFaucet(t *testing.T) {
@@ -49,30 +64,14 @@ func TestBitcoinFaucet(t *testing.T) {
 	}
 }
 
-func TestBitcoinFaucetBadRequestShouldFail(t *testing.T) {
+func TestBitcoinFaucetShouldFail(t *testing.T) {
 	r := NewTestRouter(!withLiquid)
 
-	resp := faucetRequest(r, badBtcAddress)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
+	resp := faucetRequest(r, nil)
+	checkFailed(t, resp, "Malformed Request")
 
-	err := resp.Body.String()
-	expectedError := "Invalid address"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
-
-	resp = faucetBadRequest(r)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
-
-	err = resp.Body.String()
-	expectedError = "Malformed Request"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
+	resp = faucetRequest(r, badLiquidAddress)
+	checkFailed(t, resp, "Invalid address")
 }
 
 func TestLiquidFaucet(t *testing.T) {
@@ -102,7 +101,7 @@ func TestLiquidFaucet(t *testing.T) {
 	}
 	prevBlockCount, _ = strconv.Atoi(blockCountResp.Body.String())
 
-	resp = mintRequest(r, liquidAddress, assetQuantity)
+	resp = mintRequest(r, liquidAddress, assetQuantity, contract)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("Expected status %d, got: %d\n", http.StatusOK, resp.Code)
 	}
@@ -115,84 +114,41 @@ func TestLiquidFaucet(t *testing.T) {
 	}
 }
 
-func TestLiquidFaucetBadRequestShouldFail(t *testing.T) {
+func TestLiquidFaucetShouldFail(t *testing.T) {
 	r := NewTestRouter(withLiquid)
 
-	resp := faucetRequest(r, badLiquidAddress)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
+	resp := faucetRequest(r, nil)
+	checkFailed(t, resp, "Malformed Request")
 
-	err := resp.Body.String()
-	expectedError := "Invalid address"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
+	resp = faucetRequest(r, badLiquidAddress)
+	checkFailed(t, resp, "Invalid address")
 
-	resp = mintRequest(r, badLiquidAddress, assetQuantity)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
+	resp = mintRequest(r, nil, assetQuantity, nil)
+	checkFailed(t, resp, "Malformed Request")
 
-	err = resp.Body.String()
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
+	resp = mintRequest(r, liquidAddress, nil, nil)
+	checkFailed(t, resp, "Malformed Request")
 
-	resp = mintRequest(r, liquidAddress, badAssetQuantity)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
+	resp = mintRequest(r, badLiquidAddress, assetQuantity, nil)
+	checkFailed(t, resp, "Invalid address")
 
-	err = resp.Body.String()
-	expectedError = "Amount out of range"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
+	resp = mintRequest(r, liquidAddress, badAssetQuantity, nil)
+	checkFailed(t, resp, "Amount out of range")
 
-	resp = faucetBadRequest(r)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
+	resp = mintRequest(r, liquidAddress, assetQuantity, badContract1)
+	checkFailed(t, resp, "Malformed Request")
 
-	err = resp.Body.String()
-	expectedError = "Malformed Request"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
+	resp = mintRequest(r, liquidAddress, assetQuantity, badContract2)
+	checkFailed(t, resp, "Malformed Request")
 
-	resp = mintBadRequest(r, "", assetQuantity)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
-
-	err = resp.Body.String()
-	expectedError = "Malformed Request"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
-
-	resp = mintBadRequest(r, liquidAddress, 0)
-	if resp.Code == http.StatusOK {
-		t.Fatalf("Should return error, got status: %d\n", resp.Code)
-	}
-
-	err = resp.Body.String()
-	expectedError = "Malformed Request"
-	if !strings.Contains(err, expectedError) {
-		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
-	}
+	os.Remove(filepath.Join(r.Config.RegistryPath(), "registry.json"))
 }
 
-func faucetRequest(r *Router, address string) *httptest.ResponseRecorder {
-	payload := []byte(fmt.Sprintf(`{"address": "%s"}`, address))
-	req, _ := http.NewRequest("POST", "/faucet", bytes.NewBuffer(payload))
-
-	return doRequest(r, req)
-}
-
-func faucetBadRequest(r *Router) *httptest.ResponseRecorder {
-	payload := []byte(fmt.Sprintf("{}"))
+func faucetRequest(r *Router, address interface{}) *httptest.ResponseRecorder {
+	request := map[string]interface{}{
+		"address": address,
+	}
+	payload, _ := json.Marshal(request)
 	req, _ := http.NewRequest("POST", "/faucet", bytes.NewBuffer(payload))
 
 	return doRequest(r, req)
@@ -203,19 +159,14 @@ func blockCountRequest(r *Router) *httptest.ResponseRecorder {
 	return doRequest(r, req)
 }
 
-func mintRequest(r *Router, address string, quantity float64) *httptest.ResponseRecorder {
-	payload := []byte(fmt.Sprintf(`{"address": "%s", "quantity": %f}`, address, quantity))
-	req, _ := http.NewRequest("POST", "/mint", bytes.NewBuffer(payload))
-	return doRequest(r, req)
-}
-
-func mintBadRequest(r *Router, address string, quantity float64) *httptest.ResponseRecorder {
-	payload := []byte(fmt.Sprintf(`{"address": "%s", "quantity": %f}`, address, quantity))
-	if address == "" {
-		payload = []byte(fmt.Sprintf(`{"quantity": %f}`, quantity))
-	} else {
-		payload = []byte(fmt.Sprintf(`{"address": %s}`, address))
+func mintRequest(r *Router, address, quantity, contract interface{}) *httptest.ResponseRecorder {
+	request := map[string]interface{}{
+		"address":  address,
+		"quantity": quantity,
+		"contract": contract,
 	}
+	payload, _ := json.Marshal(request)
+
 	req, _ := http.NewRequest("POST", "/mint", bytes.NewBuffer(payload))
 	return doRequest(r, req)
 }
@@ -224,4 +175,15 @@ func doRequest(r *Router, req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	return rr
+}
+
+func checkFailed(t *testing.T, resp *httptest.ResponseRecorder, expectedError string) {
+	if resp.Code == http.StatusOK {
+		t.Fatalf("Should return error, got status: %d\n", resp.Code)
+	}
+
+	err := resp.Body.String()
+	if !strings.Contains(err, expectedError) {
+		t.Fatalf("Expected error: %s, got: %s\n", expectedError, err)
+	}
 }
