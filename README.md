@@ -51,6 +51,11 @@ The web server starts at default address `localhost:3000` with the following rou
   $ curl -X POST --data '{"address": "ert1q90dz89u8eudeswzynl3p2jke564ejc2cnfcwuq", "quantity": 1000}' http://localhost:3000/mint
   # {"asset":"2dcf5a8834645654911964ec3602426fd3b9b4017554d3f9c19403e7fc1411d3","txId":"7aed7d7f6b4193875e28036728fd360785324f85dfd84d2951cc2b18ea6c2718"}
   ```
+- `/registry` (only for Liquid chain) if faucet is enabled, to get extra info about one or more assets like `name` and `ticker`
+  ```
+  $ curl -X POST --data '{"assets": ["2dcf5a8834645654911964ec3602426fd3b9b4017554d3f9c19403e7fc1411d3"]}' http://localhost:3000/registry
+  # [{"asset":"2dcf5a8834645654911964ec3602426fd3b9b4017554d3f9c19403e7fc1411d3","contract":{"name":"test","ticker":"TST"},"issuance_txin":{"txid":"a0891447adb288e5a49fa10ede7016788a1b3a175cfb423eb133e45f6cefca84","vin":0},"name":"test","ticker":"TST"
+  ```
 - all [esplora](https://github.com/blockstream/esplora/blob/master/API.md) HTTP API endpoints
 
 **Note:**  
@@ -69,3 +74,4 @@ To customize server urls and ports use flags when running the binary:
 - `--use-mining` to have the esplora /broadcast endpoint wrapped so that a block is mined after the transaction
   is published
 - `--use-logger` to log every request/response
+- `--registry-path` to set the path for the asset registry db (default to current directory - Liquid only)

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -20,6 +21,8 @@ const (
 	defaultChain       = "bitcoin"
 )
 
+var defaultRegistryPath, _ = os.Getwd()
+
 // Config type is used to parse flag options
 type Config interface {
 	IsTLSEnabled() bool
@@ -30,6 +33,7 @@ type Config interface {
 	RPCServerURL() string
 	ElectrsURL() string
 	Chain() string
+	RegistryPath() string
 }
 
 type config struct {
@@ -41,6 +45,7 @@ type config struct {
 		host          string
 		port          string
 		chain         string
+		registryPath  string
 	}
 	electrs struct {
 		host string
@@ -66,6 +71,7 @@ func NewConfigFromFlags() (Config, error) {
 	rpcAddr := flag.String("rpc-addr", defaultRPCAddr, "RPC server address")
 	rpcCookie := flag.String("rpc-cookie", defaultRPCCookie, "RPC server user and password")
 	chain := flag.String("chain", defaultChain, "Set default chain. Eihter 'bitcoin' or 'liquid'")
+	registryPath := flag.String("registry-path", defaultRegistryPath, "(Liquid only) Set path for asset registry JSON file")
 	flag.Parse()
 
 	host, port, ok := splitString(*addr)
@@ -92,6 +98,11 @@ func NewConfigFromFlags() (Config, error) {
 		return nil, fmt.Errorf("Invalid RPC server cookie")
 	}
 
+	if !filepath.IsAbs(*registryPath) {
+		flag.PrintDefaults()
+		return nil, fmt.Errorf("Invalid registry path")
+	}
+
 	c := &config{}
 	c.server.loggerEnabled = *loggerEnabled
 	c.server.tlsEnabled = *tlsEnabled
@@ -100,6 +111,7 @@ func NewConfigFromFlags() (Config, error) {
 	c.server.host = host
 	c.server.port = port
 	c.server.chain = *chain
+	c.server.registryPath = *registryPath
 
 	c.electrs.host = electrsHost
 	c.electrs.port = electrsPort
@@ -142,6 +154,10 @@ func (c *config) ElectrsURL() string {
 
 func (c *config) Chain() string {
 	return c.server.chain
+}
+
+func (c *config) RegistryPath() string {
+	return c.server.registryPath
 }
 
 func splitString(addr string) (string, string, bool) {
@@ -192,6 +208,7 @@ func NewLiquidTestConfig() Config {
 	c.server.host = "localhost"
 	c.server.port = "7001"
 	c.server.chain = "liquid"
+	c.server.registryPath = defaultRegistryPath
 
 	c.electrs.host = "localhost"
 	c.electrs.port = "3012"

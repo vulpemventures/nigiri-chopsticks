@@ -61,21 +61,27 @@ func (f *Faucet) Mine(blocks int) (int, []string, error) {
 	return status, blockHashes, nil
 }
 
-func (f *Faucet) Mint(address string, quantity float64) (int, map[string]string, error) {
+func (f *Faucet) Mint(address string, quantity float64) (int, map[string]interface{}, error) {
 	status, resp, err := handleRPCRequest(f.rpcClient, "issueasset", []interface{}{quantity, 0, false})
 	if err != nil {
 		return status, nil, err
 	}
-	asset := resp.(map[string]interface{})["asset"].(string)
+	decodedResp := resp.(map[string]interface{})
+	asset := decodedResp["asset"].(string)
+	issuanceInput := map[string]interface{}{
+		"txid": decodedResp["txid"].(string),
+		"vin":  decodedResp["vin"].(float64),
+	}
 
 	status, tx, err := handleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, quantity, "", "", false, false, 1, "UNSET", asset})
 	if err != nil {
 		return status, nil, err
 	}
 
-	res := make(map[string]string)
+	res := make(map[string]interface{})
 	res["asset"] = asset
 	res["txId"] = tx.(string)
+	res["issuance_txin"] = issuanceInput
 
 	return status, res, nil
 }
