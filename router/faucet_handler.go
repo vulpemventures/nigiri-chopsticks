@@ -27,8 +27,8 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 
 	if r.Config.IsMiningEnabled() {
 		r.Faucet.Mine(1)
-		json.NewEncoder(res).Encode(map[string]string{"txId": tx})
 	}
+	json.NewEncoder(res).Encode(map[string]string{"txId": tx})
 	return
 }
 
@@ -73,8 +73,9 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 
 	if r.Config.IsMiningEnabled() {
 		r.Faucet.Mine(1)
-		json.NewEncoder(res).Encode(resp)
 	}
+
+	json.NewEncoder(res).Encode(resp)
 	return
 }
 
