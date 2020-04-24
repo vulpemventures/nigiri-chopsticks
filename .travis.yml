@@ -3,22 +3,40 @@ language: go
 go:
   - 1.13.x
 
-env:
-  - GO111MODULE=on
-
 services:
   - docker
 
 before_install:
-  - curl https://travis.nigiri.network | bash
-  - docker-compose up -d;
+  # Get latest docker version
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  # Enable experimental for buildx tool
+  - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
+  - mkdir -p $HOME/.docker
+  - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
 
 install:
-  - bash scripts/install
+  # Get Nigiri-travis for testing
+  - mkdir -p tmp; cd tmp
+  - curl https://travis.nigiri.network | bash; cd ..
+  - docker-compose -f tmp/docker-compose.yml up -d
 
 script:
-  - bash scripts/test ci;
-  - bash scripts/build linux amd64;
+  - bash scripts/test ci
+  - bash scripts/build linux amd64
+  - docker-compose -f tmp/docker-compose.yml down
+  - sudo rm -rf tmp
 
-after_script:
-  - docker-compose down
+before_deploy:
+  # Create a builder
+  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  - docker buildx create --name xbuilder --use
+
+deploy:
+  provider: script
+  script: bash scripts/deploy
+  on:
+    repo: vulpemventures/nigiri-chopsticks
+    branch: master
