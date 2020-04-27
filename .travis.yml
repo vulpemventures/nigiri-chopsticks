@@ -39,4 +39,4 @@ deploy:
   script: bash scripts/deploy
   on:
     repo: vulpemventures/nigiri-chopsticks
-    branch: master
+    # branch: master
