@@ -11,11 +11,13 @@ Clone the repo:
 $ git clone git@github.com:vulpmeventures/nigiri-chopsticks.git
 ```
 
-Enter the folder project and install:
+Run tests:
 
-```bash
-nigiri-chopsticks $ bash scripts/install
 ```
+$ bash scripts/test local
+```
+
+To run tests locally you must have a running Nigiri instance.
 
 Build for Linux x64:
 

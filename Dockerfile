@@ -1,10 +1,8 @@
 # Start by building the application.
-FROM golang:buster as build
+FROM golang:alpine as build
 
 WORKDIR /go/src/app
 ADD . /go/src/app
-
-RUN bash scripts/install
 
 ## This beacuse of net package use dynamic linking libc
 ## https://stackoverflow.com/a/36308464/4567832 
