@@ -28,6 +28,7 @@ script:
   - bash scripts/build linux amd64
   - docker-compose -f tmp/docker-compose.yml down
   - sudo rm -rf tmp
+  - echo $TRAVIS_REPO_SLUG
 
 before_deploy:
   # Create a builder
@@ -39,4 +40,3 @@ deploy:
   script: bash scripts/deploy
   on:
     repo: vulpemventures/nigiri-chopsticks
-    # branch: master
