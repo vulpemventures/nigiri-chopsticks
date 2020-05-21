@@ -26,26 +26,28 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 	// check when request path is /asset/{asset_id}
 	if strings.HasPrefix(req.URL.Path, "/asset/") {
 		if s := strings.Split(req.URL.Path, "/"); len(s) == 3 {
-			// parse response body
-			payload, _ := ioutil.ReadAll(resp.Body)
-			body := map[string]interface{}{}
-			json.Unmarshal(payload, &body)
+			if resp.StatusCode == http.StatusOK {
+				// parse response body
+				payload, _ := ioutil.ReadAll(resp.Body)
+				body := map[string]interface{}{}
+				json.Unmarshal(payload, &body)
 
-			// get registry entry for asset
-			asset := body["asset_id"].(string)
-			entry, _ := t.r.GetEntry(asset)
+				// get registry entry for asset
+				asset := body["asset_id"].(string)
+				entry, _ := t.r.GetEntry(asset)
 
-			// if entry exist add extra info to response
-			if len(entry) > 0 {
-				body["name"] = entry["name"]
-				body["ticker"] = entry["ticker"]
-				payload, _ = json.Marshal(body)
+				// if entry exist add extra info to response
+				if len(entry) > 0 {
+					body["name"] = entry["name"]
+					body["ticker"] = entry["ticker"]
+					payload, _ = json.Marshal(body)
+				}
+
+				newBody := ioutil.NopCloser(bytes.NewReader(payload))
+				resp.Body = newBody
+				resp.ContentLength = int64(len(payload))
+				resp.Header.Set("Content-Length", strconv.Itoa(len(payload)))
 			}
-
-			newBody := ioutil.NopCloser(bytes.NewReader(payload))
-			resp.Body = newBody
-			resp.ContentLength = int64(len(payload))
-			resp.Header.Set("Content-Length", strconv.Itoa(len(payload)))
 		}
 	}
 
