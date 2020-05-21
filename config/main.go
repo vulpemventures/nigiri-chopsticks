@@ -10,15 +10,15 @@ import (
 
 const (
 	defaultTLSEnabled    = false
-	defaultLoggerEnabled = true
-	defaultFaucetEnabled = true
-	defaultMiningEnabled = true
+	defaultLoggerEnabled = false
+	defaultFaucetEnabled = false
+	defaultMiningEnabled = false
 
-	defaultAddr        = "localhost:3011"
-	defaultElectrsAddr = "localhost:3012"
-	defaultRPCAddr     = "localhost:7041"
+	defaultAddr        = "localhost:3000"
+	defaultElectrsAddr = "localhost:3002"
+	defaultRPCAddr     = "localhost:19001"
 	defaultRPCCookie   = "admin1:123"
-	defaultChain       = "liquid"
+	defaultChain       = "bitcoin"
 )
 
 var defaultRegistryPath, _ = os.Getwd()

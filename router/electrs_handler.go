@@ -3,7 +3,6 @@ package router
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -27,7 +26,6 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 	// check when request path is /asset/{asset_id}
 	if strings.HasPrefix(req.URL.Path, "/asset/") {
 		if s := strings.Split(req.URL.Path, "/"); len(s) == 3 {
-			fmt.Println(resp.Status)
 			if resp.Status == strconv.Itoa(http.StatusOK) {
 				// parse response body
 				payload, _ := ioutil.ReadAll(resp.Body)
