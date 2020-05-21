@@ -26,7 +26,7 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 	// check when request path is /asset/{asset_id}
 	if strings.HasPrefix(req.URL.Path, "/asset/") {
 		if s := strings.Split(req.URL.Path, "/"); len(s) == 3 {
-			if resp.Status == strconv.Itoa(http.StatusOK) {
+			if resp.StatusCode == http.StatusOK {
 				// parse response body
 				payload, _ := ioutil.ReadAll(resp.Body)
 				body := map[string]interface{}{}

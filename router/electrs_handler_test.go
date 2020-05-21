@@ -65,6 +65,16 @@ func TestAssetEndpointWithoutExtraInfo(t *testing.T) {
 	}
 }
 
+func TestAssetEndpointForNonExistingAssetID(t *testing.T) {
+	r := NewTestRouter(withLiquid)
+	assetID := "dummyID"
+	resp := assetRequest(r, assetID)
+
+	if resp.Code != http.StatusBadRequest {
+		t.Errorf("for non existing assetID: %v, expected status code is 400, actual: %v\n", assetID, resp.Code)
+	}
+}
+
 func assetRequest(r *Router, asset interface{}) *httptest.ResponseRecorder {
 	path := fmt.Sprintf("/asset/%s", asset)
 	req, _ := http.NewRequest("GET", path, nil)
