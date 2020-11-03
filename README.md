@@ -50,7 +50,7 @@ The web server starts at default address `localhost:3000` with the following rou
 - `/mint` (only for Liquid chain) if faucet is enabled, to issue an asset and sent all issuance amount to an address
   - example:
   ```
-  $ curl -X POST --data '{"address": "ert1q90dz89u8eudeswzynl3p2jke564ejc2cnfcwuq", "quantity": 1000}' http://localhost:3000/mint
+  $ curl -X POST --data '{"address": "ert1q90dz89u8eudeswzynl3p2jke564ejc2cnfcwuq", "quantity": 1000, "name": "TokenName", "ticker":"TKN"}' http://localhost:3000/mint
   # {"asset":"2dcf5a8834645654911964ec3602426fd3b9b4017554d3f9c19403e7fc1411d3","txId":"7aed7d7f6b4193875e28036728fd360785324f85dfd84d2951cc2b18ea6c2718"}
   ```
 - `/registry` (only for Liquid chain) if faucet is enabled, to get extra info about one or more assets like `name` and `ticker`
