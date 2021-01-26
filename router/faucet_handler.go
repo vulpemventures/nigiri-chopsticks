@@ -13,13 +13,31 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 	res.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	body := parseRequestBody(req.Body)
-	address := body["address"]
-	if address == nil {
-		http.Error(res, "Malformed Request", http.StatusBadRequest)
+	address, ok := body["address"].(string)
+	if !ok {
+		http.Error(res, "Malformed Request: missing address", http.StatusBadRequest)
 		return
 	}
+	amount, ok := body["amount"].(float64)
+	if !ok {
+		// the default 100 000 000 satoshis
+		amount = 1
+	}
+	asset, ok := body["asset"].(string)
+	if !ok {
+		// this means sending bitcoin
+		asset = ""
+	}
 
-	status, tx, err := r.Faucet.NewTransaction(address.(string))
+	var status int
+	var tx string
+	var err error
+
+	if r.Config.Chain() == "liquid" {
+		status, tx, err = r.Faucet.SendLiquidTransaction(address, amount, asset)
+	} else {
+		status, tx, err = r.Faucet.SendBitcoinTransaction(address, amount)
+	}
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
@@ -38,37 +56,55 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	body := parseRequestBody(req.Body)
-	address := body["address"]
-	if address == nil {
-		http.Error(res, "Malformed Request", http.StatusBadRequest)
+	address, ok := body["address"].(string)
+	if !ok {
+		http.Error(res, "Malformed Request: missing address", http.StatusBadRequest)
 		return
 	}
-	quantity := body["quantity"]
-	if quantity == nil {
-		http.Error(res, "Malformed Request", http.StatusBadRequest)
+	// NOTICE this is here for backward compatibility. We will deprecate and move to amount
+	quantity, qtyOk := body["quantity"].(float64)
+	amount, amtOk := body["amount"].(float64)
+
+	if !qtyOk && !amtOk {
+		http.Error(res, "Malformed Request: missing amount", http.StatusBadRequest)
 		return
-	}
-	name := body["name"]
-	ticker := body["ticker"]
-	if name != nil || ticker != nil {
-		if ticker == nil || name == nil {
-			http.Error(res, "Malformed Request", http.StatusBadRequest)
-			return
-		}
 	}
 
-	status, resp, err := r.Faucet.Mint(address.(string), quantity.(float64))
+	if qtyOk && !amtOk {
+		amount = quantity
+	}
+
+	status, resp, err := r.Faucet.Mint(address, amount)
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
 	}
 
-	if name != nil {
+	asset, ok := resp["asset"].(string)
+	if !ok {
+		http.Error(res, "Internal error", http.StatusInternalServerError)
+		return
+	}
+	issuanceTx, ok := resp["issuance_txin"].(map[string]interface{})
+	if !ok {
+		http.Error(res, "Internal error", http.StatusInternalServerError)
+		return
+	}
+
+	name, nameOk := body["name"].(string)
+	ticker, tickerOk := body["ticker"].(string)
+
+	if (nameOk && !tickerOk) || (!nameOk && tickerOk) {
+		http.Error(res, "Malformed Request: missing name or ticker", http.StatusBadRequest)
+		return
+	}
+
+	if nameOk && tickerOk {
 		contract := map[string]interface{}{
 			"name":   name,
 			"ticker": ticker,
 		}
-		r.Registry.AddEntry(resp["asset"].(string), resp["issuance_txin"].(map[string]interface{}), contract)
+		r.Registry.AddEntry(asset, issuanceTx, contract)
 	}
 
 	if r.Config.IsMiningEnabled() {

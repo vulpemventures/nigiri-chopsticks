@@ -3,12 +3,18 @@
 set -e
 
 case $1 in
-  local) ci="false";;
-  ci) ci="true";;
-  *) echo "Invalid option. Aborting."; exit 1;;
+local) ci="false" ;;
+ci) ci="true" ;;
+*)
+  echo "Specify a valid option via the CI environment variable. Aborting."
+  exit 1
+  ;;
 esac
 
-PARENT_PATH=$(dirname $(cd $(dirname $0); pwd -P))
+PARENT_PATH=$(dirname $(
+  cd $(dirname $0)
+  pwd -P
+))
 
 pushd $PARENT_PATH
 
