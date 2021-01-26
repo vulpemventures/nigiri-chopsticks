@@ -99,7 +99,7 @@ func TestLiquidFaucet(t *testing.T) {
 	if resp.Code != http.StatusOK {
 		t.Fatalf("Expected status %d, got: %d\n", http.StatusOK, resp.Code)
 	}
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	var decodedBody map[string]interface{}
 	err = json.Unmarshal(resp.Body.Bytes(), &decodedBody)
@@ -116,7 +116,7 @@ func TestLiquidFaucet(t *testing.T) {
 	blockCount, _ = strconv.Atoi(blockCountResp.Body.String())
 	blockMined = blockCount - prevBlockCount
 	if blockMined < 1 {
-		t.Fatalf("Expected 1 block mined, got %d\n", blockMined)
+		t.Fatalf("Expected at least 1 block mined, got %d\n", blockMined)
 	}
 
 }
