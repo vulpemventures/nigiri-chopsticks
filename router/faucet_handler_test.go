@@ -107,15 +107,15 @@ func TestLiquidFaucet(t *testing.T) {
 		t.Fatalf("decoding response error")
 	}
 
-	resp2 := faucetRequest(r, liquidAddress, 25, decodedBody["asset"].(string))
+	resp2 := faucetRequest(r, liquidAddress, 0, decodedBody["asset"].(string))
 	if resp2.Code != http.StatusOK {
 		t.Fatalf("Expected status %d, got: %d\n", http.StatusOK, resp2.Code)
 	}
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 	blockCountResp = blockCountRequest(r)
 	blockCount, _ = strconv.Atoi(blockCountResp.Body.String())
 	blockMined = blockCount - prevBlockCount
-	if blockMined != 1 {
+	if blockMined < 1 {
 		t.Fatalf("Expected 1 block mined, got %d\n", blockMined)
 	}
 
@@ -152,12 +152,13 @@ func TestLiquidFaucetShouldFail(t *testing.T) {
 }
 
 func faucetRequest(r *Router, address string, amount float64, asset string) *httptest.ResponseRecorder {
-	if amount <= 0 {
-		amount = 1
-	}
+
 	request := map[string]interface{}{
 		"address": address,
-		"amount":  amount,
+	}
+
+	if amount > 0 {
+		request["amount"] = amount
 	}
 
 	if len(asset) > 0 {

@@ -66,7 +66,7 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 	amount, amtOk := body["amount"].(float64)
 
 	if !qtyOk && !amtOk {
-		http.Error(res, "Malformed Request: missing address", http.StatusBadRequest)
+		http.Error(res, "Malformed Request: missing amount", http.StatusBadRequest)
 		return
 	}
 
