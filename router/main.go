@@ -39,10 +39,15 @@ func NewRouter(config cfg.Config) *Router {
 			r.HandleFunc("/registry", r.HandleRegistryRequest).Methods("POST")
 		}
 
-		status, blockHashes, err := r.Faucet.Fund()
+		var numBlockToGenerate int = 1
+		if config.Chain() == "liquid" {
+			numBlockToGenerate = 101
+		}
+		status, blockHashes, err := r.Faucet.Fund(numBlockToGenerate)
+
 		for err != nil && strings.Contains(err.Error(), "Loading") && status == 500 {
 			time.Sleep(2 * time.Second)
-			status, blockHashes, err = r.Faucet.Fund()
+			status, blockHashes, err = r.Faucet.Fund(numBlockToGenerate)
 		}
 		if err != nil {
 			log.WithField("status", status).WithError(err).Warning("Faucet not funded, check the error")
