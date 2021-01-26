@@ -40,7 +40,7 @@ func NewRouter(config cfg.Config) *Router {
 		}
 
 		var numBlockToGenerate int = 1
-		if config.Chain() == "liquid" {
+		if config.Chain() == "bitcoin" {
 			numBlockToGenerate = 101
 		}
 		status, blockHashes, err := r.Faucet.Fund(numBlockToGenerate)

@@ -34,7 +34,7 @@ func TestBitcoinFaucet(t *testing.T) {
 	}
 	prevBlockCount, _ := strconv.Atoi(blockCountResp.Body.String())
 
-	faucetResp := faucetRequest(r, btcAddress, 0, "")
+	faucetResp := faucetRequest(r, btcAddress, 1, "")
 	if faucetResp.Code != http.StatusOK {
 		t.Fatalf("Expected status %d, got: %d\n", http.StatusOK, faucetResp.Code)
 	}
