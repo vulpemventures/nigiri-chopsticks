@@ -114,3 +114,18 @@ func (c *RpcClient) doTimeoutRequest(timer *time.Timer, req *http.Request) (*htt
 		return nil, fmt.Errorf("Timeout reading data from server")
 	}
 }
+
+// HandleRPCRequest call a JSONRPC and decoded the JSON body as response
+func HandleRPCRequest(client *RpcClient, method string, params []interface{}) (int, interface{}, error) {
+	status, resp, err := client.Call(method, params)
+	if err != nil {
+		return status, "", err
+	}
+	var out interface{}
+	err = json.Unmarshal(resp.Result, &out)
+	if err != nil {
+		return http.StatusInternalServerError, "", err
+	}
+
+	return status, out, nil
+}

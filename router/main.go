@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
@@ -24,6 +25,8 @@ type Router struct {
 // NewRouter returns a new Router instance
 func NewRouter(config cfg.Config) *Router {
 	router := mux.NewRouter().StrictSlash(true)
+	router.Use(mux.CORSMethodMiddleware(router))
+
 	rpcClient, _ := helpers.NewRpcClient(config.RPCServerURL(), false, 10)
 
 	r := &Router{router, config, rpcClient, nil, nil}
@@ -31,12 +34,12 @@ func NewRouter(config cfg.Config) *Router {
 	if r.Config.IsFaucetEnabled() {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
 		r.Faucet = faucet
-		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods("POST")
+		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods(http.MethodPost, http.MethodOptions)
 		if config.Chain() == "liquid" {
 			registry, _ := helpers.NewRegistry(config.RegistryPath())
 			r.Registry = registry
-			r.HandleFunc("/mint", r.HandleMintRequest).Methods("POST")
-			r.HandleFunc("/registry", r.HandleRegistryRequest).Methods("POST")
+			r.HandleFunc("/mint", r.HandleMintRequest).Methods(http.MethodPost, http.MethodOptions)
+			r.HandleFunc("/registry", r.HandleRegistryRequest).Methods(http.MethodPost, http.MethodOptions)
 		}
 
 		var numBlockToGenerate int = 1
@@ -60,7 +63,9 @@ func NewRouter(config cfg.Config) *Router {
 	if config.IsLoggerEnabled() {
 		r.Use(middleware.Logger)
 	}
-	r.HandleFunc("/tx", r.HandleBroadcastRequest).Methods("POST")
+
+	r.HandleFunc("/address", r.HandleAddressRequest).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/tx", r.HandleBroadcastRequest).Methods(http.MethodPost, http.MethodOptions)
 	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest)
 
 	return r

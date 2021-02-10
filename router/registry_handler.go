@@ -8,7 +8,7 @@ import (
 // HandleRegistryRequest accepts a list of asset ids and returns info retrieved from
 // the asset registry about them
 func (r *Router) HandleRegistryRequest(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Access-Control-Allow-Methods", "POST")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 
 	body := parseRequestBody(req.Body)
 	assets := body["assets"]
