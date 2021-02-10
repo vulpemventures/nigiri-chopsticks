@@ -1,4 +1,4 @@
-.PHONY: build clean fmt run test
+.PHONY: build clean fmt test
 
 ## build
 build: clean 
