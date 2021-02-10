@@ -10,7 +10,7 @@ import (
 // retrieving the signed transaction from the faucet and broadcasting via the
 // electrs broadcast endpoint
 func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Access-Control-Allow-Methods", "POST")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 
 	body := parseRequestBody(req.Body)
 	address, ok := body["address"].(string)
@@ -53,7 +53,7 @@ func (r *Router) HandleFaucetRequest(res http.ResponseWriter, req *http.Request)
 // HandleMintRequest is a Liquid only endpoint that issues a requested quantity
 // of a new asset and sends it to the requested address
 func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Access-Control-Allow-Methods", "POST")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 
 	body := parseRequestBody(req.Body)
 	address, ok := body["address"].(string)
@@ -101,8 +101,9 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 
 	if nameOk && tickerOk {
 		contract := map[string]interface{}{
-			"name":   name,
-			"ticker": ticker,
+			"name":      name,
+			"ticker":    ticker,
+			"precision": 8, // we hardcode 8 as precision which is default with issueasset RPC on elements node
 		}
 		r.Registry.AddEntry(asset, issuanceTx, contract)
 	}

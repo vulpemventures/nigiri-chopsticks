@@ -24,6 +24,7 @@ install:
   - docker-compose -f tmp/docker-compose.yml up -d
 
 script:
+  - if [ -n "$(gofmt -l .)" ]; then echo "Go code is not formatted"; exit 1; fi
   - bash scripts/test ci
   - bash scripts/build linux amd64
   - docker-compose -f tmp/docker-compose.yml down

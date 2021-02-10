@@ -70,7 +70,7 @@ To customize server urls and ports use flags when running the binary:
 
 - `--chain` one between `bitcoin` and `liquid`
 - `--addr` server listening address (default `localhost:3000`)
-- `--btc-addr` btc RPC server listening address (default `localhost:19001`)
+- `--rpc-addr` btc RPC server listening address (default `localhost:19001`)
 - `--btc-cookie` btc RPC server user and password (default `admin1:123`)
 - `--liquid-addr` liquid RPC server listening address (default `localhost:18884`)
 - `--electrs-addr` electrs HTTP server listening address (default `localhost:3002`)

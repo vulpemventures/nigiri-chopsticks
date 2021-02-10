@@ -1,9 +1,6 @@
 package faucet
 
 import (
-	"encoding/json"
-	"net/http"
-
 	"github.com/vulpemventures/nigiri-chopsticks/helpers"
 )
 
@@ -19,7 +16,7 @@ func NewFaucet(url string, client *helpers.RpcClient) *Faucet {
 
 // SendBitcoinTransaction calls the sendtoaddress method of the bitcoin node to the given address with the fractional amount
 func (f *Faucet) SendBitcoinTransaction(address string, amount float64) (int, string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, amount})
+	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, amount})
 	if err != nil {
 		return status, "", err
 	}
@@ -30,7 +27,7 @@ func (f *Faucet) SendBitcoinTransaction(address string, amount float64) (int, st
 // SendLiquidTransaction calls the sendtoaddress method of the elements node to the given address with the fractional amount of the given asset hash.
 // If asset hash is empty will send Liquid Bitcoin
 func (f *Faucet) SendLiquidTransaction(address string, amount float64, asset string) (int, string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, amount, "", "", false, false, 1, "UNSET", asset})
+	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, amount, "", "", false, false, 1, "UNSET", asset})
 	if err != nil {
 		return status, "", err
 	}
@@ -41,7 +38,7 @@ func (f *Faucet) SendLiquidTransaction(address string, amount float64, asset str
 // Fund  "mature" the balance mining block if not already mined
 //liquid starts with initialfreecoins = 21,000,000 LBTC
 func (f *Faucet) Fund(numBlocks int) (int, []string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "getblockcount", nil)
+	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "getblockcount", nil)
 	if err != nil {
 		return status, nil, err
 	}
@@ -55,13 +52,13 @@ func (f *Faucet) Fund(numBlocks int) (int, []string, error) {
 
 // Mine will generated block versus an address of the wallet
 func (f *Faucet) Mine(blocks int) (int, []string, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "getnewaddress", nil)
+	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "getnewaddress", nil)
 	if err != nil {
 		return status, nil, err
 	}
 	address := resp.(string)
 
-	status, resp, err = handleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{blocks, address})
+	status, resp, err = helpers.HandleRPCRequest(f.rpcClient, "generatetoaddress", []interface{}{blocks, address})
 	if err != nil {
 		return status, nil, err
 	}
@@ -76,7 +73,7 @@ func (f *Faucet) Mine(blocks int) (int, []string, error) {
 
 // Mint issue a new Liquid asset
 func (f *Faucet) Mint(address string, quantity float64) (int, map[string]interface{}, error) {
-	status, resp, err := handleRPCRequest(f.rpcClient, "issueasset", []interface{}{quantity, 0, false})
+	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "issueasset", []interface{}{quantity, 0, false})
 	if err != nil {
 		return status, nil, err
 	}
@@ -98,18 +95,4 @@ func (f *Faucet) Mint(address string, quantity float64) (int, map[string]interfa
 	res["issuance_txin"] = issuanceInput
 
 	return status, res, nil
-}
-
-func handleRPCRequest(client *helpers.RpcClient, method string, params []interface{}) (int, interface{}, error) {
-	status, resp, err := client.Call(method, params)
-	if err != nil {
-		return status, "", err
-	}
-	var out interface{}
-	err = json.Unmarshal(resp.Result, &out)
-	if err != nil {
-		return http.StatusInternalServerError, "", err
-	}
-
-	return status, out, nil
 }

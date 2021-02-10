@@ -43,6 +43,7 @@ func (r *Registry) AddEntry(asset string, issuanceInput map[string]interface{}, 
 		"contract":      contract,
 		"name":          contract["name"].(string),
 		"ticker":        contract["ticker"].(string),
+		"precision":     contract["precision"].(int),
 	}
 	return r.db.Write("registry", asset, entry)
 }

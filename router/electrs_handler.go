@@ -40,6 +40,7 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 				if len(entry) > 0 {
 					body["name"] = entry["name"]
 					body["ticker"] = entry["ticker"]
+					body["precision"] = entry["precision"]
 					payload, _ = json.Marshal(body)
 				}
 
@@ -66,5 +67,7 @@ func (r *Router) HandleElectrsRequest(res http.ResponseWriter, req *http.Request
 
 	proxy := httputil.NewSingleHostReverseProxy(parsedURL)
 	proxy.Transport = &transport{r.Registry}
+	//cors
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 	proxy.ServeHTTP(res, req)
 }
