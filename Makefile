@@ -21,6 +21,10 @@ help:
 	@echo "Usage: \n"
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
 
+## run: Run a liquid version against local nigiri (docker stop chopsticks-liquid before running this)
+run: clean build
+	./build/nigiri-chopsticks --chain liquid --rpc-addr localhost:7041 --electrs-addr localhost:3012 --use-faucet --use-mining --use-logger --addr localhost:3001
+
 ## run the short tests
 test: fmt 
 	@echo "Test..."
