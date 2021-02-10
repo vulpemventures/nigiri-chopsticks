@@ -8,7 +8,6 @@ import (
 
 // HandleBroadcastRequest forwards the request to the electrs HTTP server and mines a block if mining is enabled
 func (r *Router) HandleBroadcastRequest(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Access-Control-Allow-Origin", "*")
 	r.HandleElectrsRequest(res, req)
 
 	if r.Config.IsMiningEnabled() {

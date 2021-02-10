@@ -25,11 +25,20 @@ type Router struct {
 // NewRouter returns a new Router instance
 func NewRouter(config cfg.Config) *Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.Use(mux.CORSMethodMiddleware(router))
 
 	rpcClient, _ := helpers.NewRpcClient(config.RPCServerURL(), false, 10)
 
 	r := &Router{router, config, rpcClient, nil, nil}
+
+	// Handle all preflight request
+	r.Router.Methods(http.MethodOptions).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// fmt.Printf("OPTIONS")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	})
 
 	if r.Config.IsFaucetEnabled() {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
@@ -66,7 +75,7 @@ func NewRouter(config cfg.Config) *Router {
 
 	r.HandleFunc("/address", r.HandleAddressRequest).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/tx", r.HandleBroadcastRequest).Methods(http.MethodPost, http.MethodOptions)
-	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodOptions)
+	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest)
 
 	return r
 }

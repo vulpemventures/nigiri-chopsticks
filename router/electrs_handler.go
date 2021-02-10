@@ -67,7 +67,5 @@ func (r *Router) HandleElectrsRequest(res http.ResponseWriter, req *http.Request
 
 	proxy := httputil.NewSingleHostReverseProxy(parsedURL)
 	proxy.Transport = &transport{r.Registry}
-	//cors
-	res.Header().Set("Access-Control-Allow-Origin", "*")
 	proxy.ServeHTTP(res, req)
 }
