@@ -37,7 +37,6 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 				entry, _ := t.r.GetEntry(asset)
 
 				// if entry exist add extra info to response
-				println(entry["precision"])
 				if len(entry) > 0 {
 					body["name"] = entry["name"]
 					body["ticker"] = entry["ticker"]
