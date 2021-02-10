@@ -101,8 +101,9 @@ func (r *Router) HandleMintRequest(res http.ResponseWriter, req *http.Request) {
 
 	if nameOk && tickerOk {
 		contract := map[string]interface{}{
-			"name":   name,
-			"ticker": ticker,
+			"name":      name,
+			"ticker":    ticker,
+			"precision": 8, // we hardcode 8 as precision which is default with issueasset RPC on elements node
 		}
 		r.Registry.AddEntry(asset, issuanceTx, contract)
 	}

@@ -1,0 +1,15 @@
+{
+	"asset": "0b4ad479777d63d8903dd407dc7bb66dc24cac9d3cbf3369e764f92e0452d4ba",
+	"contract": {
+		"name": "vulpem",
+		"precision": 8,
+		"ticker": "VLP"
+	},
+	"issuance_txin": {
+		"txid": "9c8e544517309177384322c4dedc9fcb9d298ec23caea9d81f7fc0ab9b8d9130",
+		"vin": 0
+	},
+	"name": "vulpem",
+	"precision": 8,
+	"ticker": "VLP"
+}

@@ -37,12 +37,14 @@ func (r *Registry) AddEntry(asset string, issuanceInput map[string]interface{}, 
 		return errors.New("Asset already exists on registry")
 	}
 
+	println(contract["precision"].(int))
 	entry = map[string]interface{}{
 		"asset":         asset,
 		"issuance_txin": issuanceInput,
 		"contract":      contract,
 		"name":          contract["name"].(string),
 		"ticker":        contract["ticker"].(string),
+		"precision":     contract["precision"].(int),
 	}
 	return r.db.Write("registry", asset, entry)
 }

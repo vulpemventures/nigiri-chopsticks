@@ -66,7 +66,7 @@ func NewRouter(config cfg.Config) *Router {
 
 	r.HandleFunc("/address", r.HandleAddressRequest).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/tx", r.HandleBroadcastRequest).Methods(http.MethodPost, http.MethodOptions)
-	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest)
+	r.PathPrefix("/").HandlerFunc(r.HandleElectrsRequest).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodOptions)
 
 	return r
 }
