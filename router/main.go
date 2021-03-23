@@ -26,7 +26,8 @@ type Router struct {
 func NewRouter(config cfg.Config) *Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	rpcClient, _ := helpers.NewRpcClient(config.RPCServerURL(), false, 10)
+	// here we are forcing always the calls against the bitcoin/elements default wallet ""
+	rpcClient, _ := helpers.NewRpcClient(config.RPCServerURL()+"/wallet/", false, 10)
 
 	r := &Router{router, config, rpcClient, nil, nil}
 
