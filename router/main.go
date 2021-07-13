@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
@@ -41,6 +40,22 @@ func NewRouter(config cfg.Config) *Router {
 		return
 	})
 
+	status, resp, err := helpers.HandleRPCRequest(r.RPCClient, "getblockcount", nil)
+	
+	if err != nil {
+		log.WithField("status", status).WithError(err).Warning("Could not get block count")
+	}
+
+	if blockCount := resp.(float64); blockCount <= 0 {
+		var walletName interface{} = ""
+		status, resp, err := helpers.HandleRPCRequest(r.RPCClient, "createwallet", []interface{}{walletName})
+		if err != nil {
+			log.WithField("status", status).WithError(err).Warning("Could not create wallet") 
+		} else {
+			log.WithField("wallets", resp).Info("Wallet has been created")
+		}
+	}
+	
 	if r.Config.IsFaucetEnabled() {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
 		r.Faucet = faucet
