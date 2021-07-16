@@ -28,5 +28,9 @@ run: clean build
 ## run the short tests
 test: fmt 
 	@echo "Test..."
-	CI=local go test -v -race ./...
+	CI=false go test -v -race ./...
 
+## run the short tests
+testci: fmt 
+	@echo "Test..."
+	CI=true go test -v -race ./...
