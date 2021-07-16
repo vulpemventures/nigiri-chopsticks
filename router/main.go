@@ -38,8 +38,15 @@ func NewRouter(config cfg.Config) *Router {
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.WriteHeader(http.StatusNoContent)
-		return
 	})
+
+	// From Bitcoin core 0.21 the default wallet "" is not created anymore.
+	//So we check if none is already loaded and we create it
+	err := helpers.CreateWalletIfNotExists(rpcClient)
+	if err != nil {
+		log.WithError(err).Fatalln("creating wallet")
+	}
+	log.Debug("empty wallet has been created")
 
 	if r.Config.IsFaucetEnabled() {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
