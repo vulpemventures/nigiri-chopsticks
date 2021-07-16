@@ -36,11 +36,12 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=ghcr.io/vulpemventures/$IMAGE_NAME
+          TAG=${{ steps.next_tag.outputs.tag }}
 
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
           echo IMAGE_ID=$IMAGE_ID
-          echo TAG=${{ steps.next_tag.outputs.tag }}
+          echo TAG=$TAG
 
           docker tag $IMAGE_NAME $IMAGE_ID:$TAG
           docker push $IMAGE_ID:$TAG
