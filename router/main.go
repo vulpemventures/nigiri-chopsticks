@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	cfg "github.com/vulpemventures/nigiri-chopsticks/config"
@@ -37,25 +38,16 @@ func NewRouter(config cfg.Config) *Router {
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.WriteHeader(http.StatusNoContent)
-		return
 	})
 
-	status, resp, err := helpers.HandleRPCRequest(r.RPCClient, "getblockcount", nil)
-	
+	// From Bitcoin core 0.21 the default wallet "" is not created anymore.
+	//So we check if none is already loaded and we create it
+	err := helpers.CreateWalletIfNotExists(rpcClient)
 	if err != nil {
-		log.WithField("status", status).WithError(err).Warning("Could not get block count")
+		log.WithError(err).Fatalln("creating wallet")
 	}
+	log.Debug("empty wallet has been created")
 
-	if blockCount := resp.(float64); blockCount <= 0 {
-		var walletName interface{} = ""
-		status, resp, err := helpers.HandleRPCRequest(r.RPCClient, "createwallet", []interface{}{walletName})
-		if err != nil {
-			log.WithField("status", status).WithError(err).Warning("Could not create wallet") 
-		} else {
-			log.WithField("wallets", resp).Info("Wallet has been created")
-		}
-	}
-	
 	if r.Config.IsFaucetEnabled() {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
 		r.Faucet = faucet
