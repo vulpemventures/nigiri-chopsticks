@@ -79,9 +79,9 @@ func NewRouter(config cfg.Config) *Router {
 		// From Elements core 0.21 if we use initialfreecoins we must rescan the chain
 		err = helpers.RescanBlockchain(rpcClient)
 		if err != nil {
-			log.WithError(err).Fatalln("creating wallet")
+			log.WithError(err).Fatalln("rescan blockchain")
 		}
-		log.Debug("empty wallet has been created")
+		log.Debug("rescan completed")
 	}
 
 	if config.IsLoggerEnabled() {
