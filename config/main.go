@@ -184,7 +184,7 @@ func NewTestConfig() Config {
 	c.server.chain = "bitcoin"
 
 	c.electrs.host = "localhost"
-	c.electrs.port = "3002"
+	c.electrs.port = "30000"
 
 	c.rpcServer.host = "localhost"
 	c.rpcServer.port = rpcPort
@@ -196,7 +196,7 @@ func NewTestConfig() Config {
 
 func NewLiquidTestConfig() Config {
 	c := &config{}
-	rpcPort := "7041"
+	rpcPort := "18884"
 	if os.Getenv("CI") == "true" {
 		rpcPort = "18884"
 	}
@@ -211,7 +211,7 @@ func NewLiquidTestConfig() Config {
 	c.server.registryPath = defaultRegistryPath
 
 	c.electrs.host = "localhost"
-	c.electrs.port = "3012"
+	c.electrs.port = "30001"
 
 	c.rpcServer.host = "localhost"
 	c.rpcServer.port = rpcPort
