@@ -26,6 +26,7 @@ const (
 )
 
 func TestBitcoinFaucet(t *testing.T) {
+	t.Skip()
 	r := NewTestRouter(!withLiquid)
 
 	blockCountResp := blockCountRequest(r)
@@ -54,6 +55,8 @@ func TestBitcoinFaucet(t *testing.T) {
 }
 
 func TestBitcoinFaucetShouldFail(t *testing.T) {
+	t.Skip()
+
 	r := NewTestRouter(!withLiquid)
 
 	resp := faucetRequest(r, "", 0, "")
@@ -64,6 +67,8 @@ func TestBitcoinFaucetShouldFail(t *testing.T) {
 }
 
 func TestLiquidFaucet(t *testing.T) {
+	t.Skip()
+
 	r := NewTestRouter(withLiquid)
 
 	blockCountResp := blockCountRequest(r)
@@ -122,6 +127,8 @@ func TestLiquidFaucet(t *testing.T) {
 }
 
 func TestLiquidFaucetShouldFail(t *testing.T) {
+	t.Skip()
+
 	r := NewTestRouter(withLiquid)
 
 	resp := faucetRequest(r, "", 0, "")

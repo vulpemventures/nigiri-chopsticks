@@ -13,6 +13,7 @@ import (
 )
 
 func TestBroadcastLiquidTransaction(t *testing.T) {
+	t.Skip()
 	r := NewTestRouter(withLiquid)
 	client := r.RPCClient
 

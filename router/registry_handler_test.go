@@ -12,6 +12,7 @@ import (
 )
 
 func TestRegistry(t *testing.T) {
+	t.Skip()
 	r := NewTestRouter(withLiquid)
 	resp := mintRequest(r, liquidAddress, assetQuantity, name, ticker)
 
@@ -47,6 +48,7 @@ func TestRegistry(t *testing.T) {
 }
 
 func TestRegistryShouldFail(t *testing.T) {
+	t.Skip()
 	r := NewTestRouter(withLiquid)
 	resp := registryRequest(r, nil)
 	checkFailed(t, resp, "Malformed Request")
