@@ -75,6 +75,13 @@ func NewRouter(config cfg.Config) *Router {
 		if len(blockHashes) > 0 {
 			log.WithField("num_blocks", len(blockHashes)).Info("Faucet has been funded mining some blocks")
 		}
+
+		// From Elements core 0.21 if we use initialfreecoins we must rescan the chain
+		err = helpers.RescanBlockchain(rpcClient)
+		if err != nil {
+			log.WithError(err).Fatalln("creating wallet")
+		}
+		log.Debug("empty wallet has been created")
 	}
 
 	if config.IsLoggerEnabled() {
