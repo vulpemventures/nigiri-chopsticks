@@ -27,7 +27,7 @@ func (f *Faucet) SendBitcoinTransaction(address string, amount float64) (int, st
 // SendLiquidTransaction calls the sendtoaddress method of the elements node to the given address with the fractional amount of the given asset hash.
 // If asset hash is empty will send Liquid Bitcoin
 func (f *Faucet) SendLiquidTransaction(address string, amount float64, asset string) (int, string, error) {
-	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, amount, "", "", false, false, 1, "UNSET", asset})
+	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "sendtoaddress", []interface{}{address, amount, "", "", false, false, 1, "UNSET", false, asset})
 	if err != nil {
 		return status, "", err
 	}

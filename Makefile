@@ -29,7 +29,7 @@ run: clean build
 
 ## runliquid: Run a liquid version against local nigiri (docker stop chopsticks-liquid before running this)
 runliquid: clean build
-	./build/nigiri-chopsticks --chain liquid --rpc-addr localhost:7041 --electrs-addr localhost:3012 --use-faucet --use-mining --use-logger --addr localhost:3001
+	./build/nigiri-chopsticks --chain liquid --rpc-addr localhost:18884 --electrs-addr localhost:30001 --use-faucet --use-mining --use-logger --addr localhost:3001
 
 ## run the short tests
 test: fmt 
