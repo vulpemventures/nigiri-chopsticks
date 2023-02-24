@@ -8,6 +8,5 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/sdomino/scribble v0.0.0-20191024200645-4116320640ba
 	github.com/sirupsen/logrus v1.4.0
-	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a
-	golang.org/x/sys v0.0.0-20190312061237-fead79001313 // indirect
+	golang.org/x/crypto v0.1.0
 )
