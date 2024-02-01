@@ -11,12 +11,11 @@ import (
 func (r *Router) HandleAddressRequest(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 
-	status, resp, err := helpers.HandleRPCRequest(r.RPCClient, "getnewaddress", []interface{}{"", "bech32"})
+	status, resp, err := helpers.HandleRPCRequest(r.RPCClient, "getnewaddress", []interface{}{})
 	if err != nil {
 		http.Error(res, err.Error(), status)
 		return
 	}
 
 	json.NewEncoder(res).Encode(map[string]string{"address": resp.(string)})
-	return
 }
