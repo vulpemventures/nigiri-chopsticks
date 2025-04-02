@@ -66,17 +66,29 @@ The web server starts at default address `localhost:3000` with the following rou
 If mining is enabled, the esplora broadcast endpoint is wrapped so that a block is mined just after the transaction is published to get it confirmed; this is useful when running in regtest network.  
 All requests to chopsticks are (optionally) logged using a logger inspired by [negroni](https://github.com/urfave/negroni) package.
 
-To customize server urls and ports use flags when running the binary:
 
-- `--chain` one between `bitcoin` and `liquid`
-- `--addr` server listening address (default `localhost:3000`)
-- `--rpc-addr` btc RPC server listening address (default `localhost:19001`)
-- `--btc-cookie` btc RPC server user and password (default `admin1:123`)
-- `--liquid-addr` liquid RPC server listening address (default `localhost:18884`)
-- `--electrs-addr` electrs HTTP server listening address (default `localhost:3002`)
-- `--use-tls` specify using either `http` or `https` (default `true`)
-- `--use-faucet` to have a /faucet endpoint available for sending funds
-- `--use-mining` to have the esplora /broadcast endpoint wrapped so that a block is mined after the transaction
-  is published
-- `--use-logger` to log every request/response
-- `--registry-path` to set the path for the asset registry db (default to current directory - Liquid only)
+## Configuration: Command-Line Flags
+
+### Network Selection
+- `--chain` - Choose between bitcoin or liquid networks
+- `--wallet-name` - Specify wallet name (default: empty string `""`)
+
+### Server Configuration
+- `--addr` - Server listening address (default: localhost:3000)
+- `--use-tls` - Enable/disable HTTPS (default: true)
+- `--use-logger` - Log all request/response activity
+
+### Bitcoin Node Connection
+- `--rpc-addr` - Bitcoin RPC server address (default: localhost:19001)
+- `--btc-cookie` - Bitcoin RPC credentials (default: admin1:123)
+
+### Liquid Node Connection
+- `--liquid-addr` - Liquid RPC server address (default: localhost:18884)
+- `--registry-path` - Path for asset registry database (Liquid only, defaults to current directory)
+
+### Electrum Server Connection
+- `--electrs-addr` - Electrs HTTP server address (default: localhost:3002)
+
+### Testing Utilities
+- `--use-faucet` - Enable /faucet endpoint for requesting funds
+- `--use-mining` - Enable automatic block mining after transaction broadcast
