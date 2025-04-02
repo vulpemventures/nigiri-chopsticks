@@ -19,6 +19,7 @@ const (
 	defaultRPCAddr     = "localhost:19001"
 	defaultRPCCookie   = "admin1:123"
 	defaultChain       = "bitcoin"
+	defaultWalletName  = ""
 )
 
 var defaultRegistryPath, _ = os.Getwd()
@@ -34,6 +35,7 @@ type Config interface {
 	ElectrsURL() string
 	Chain() string
 	RegistryPath() string
+	WalletName() string
 }
 
 type config struct {
@@ -46,6 +48,7 @@ type config struct {
 		port          string
 		chain         string
 		registryPath  string
+		walletName    string
 	}
 	electrs struct {
 		host string
@@ -72,6 +75,7 @@ func NewConfigFromFlags() (Config, error) {
 	rpcCookie := flag.String("rpc-cookie", defaultRPCCookie, "RPC server user and password")
 	chain := flag.String("chain", defaultChain, "Set default chain. Eihter 'bitcoin' or 'liquid'")
 	registryPath := flag.String("registry-path", defaultRegistryPath, "(Liquid only) Set path for asset registry JSON file")
+	walletName := flag.String("wallet-name", defaultWalletName, "Wallet name")
 	flag.Parse()
 
 	host, port, ok := splitString(*addr)
@@ -112,6 +116,7 @@ func NewConfigFromFlags() (Config, error) {
 	c.server.port = port
 	c.server.chain = *chain
 	c.server.registryPath = *registryPath
+	c.server.walletName = *walletName
 
 	c.electrs.host = electrsHost
 	c.electrs.port = electrsPort
@@ -154,6 +159,10 @@ func (c *config) ElectrsURL() string {
 
 func (c *config) Chain() string {
 	return c.server.chain
+}
+
+func (c *config) WalletName() string {
+	return c.server.walletName
 }
 
 func (c *config) RegistryPath() string {
