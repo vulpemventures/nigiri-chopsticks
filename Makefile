@@ -24,7 +24,7 @@ help:
 
 ## run: Run a bitcoin version against local nigiri (docker stop chopsticks before running this)
 run: clean build
-	./build/nigiri-chopsticks --rpc-addr 127.0.0.1:18433 --electrs-addr localhost:3002 --use-faucet --use-mining --use-logger --addr localhost:3000
+	./build/nigiri-chopsticks --rpc-addr 127.0.0.1:18443 --electrs-addr localhost:30000 --use-faucet --use-mining --use-logger --addr localhost:3000
 
 
 ## runliquid: Run a liquid version against local nigiri (docker stop chopsticks-liquid before running this)

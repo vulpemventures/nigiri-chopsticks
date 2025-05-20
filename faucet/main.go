@@ -36,7 +36,7 @@ func (f *Faucet) SendLiquidTransaction(address string, amount float64, asset str
 }
 
 // Fund  "mature" the balance mining block if not already mined
-//liquid starts with initialfreecoins = 21,000,000 LBTC
+// liquid starts with initialfreecoins = 21,000,000 LBTC
 func (f *Faucet) Fund(numBlocks int) (int, []string, error) {
 	status, resp, err := helpers.HandleRPCRequest(f.rpcClient, "getblockcount", nil)
 	if err != nil {
