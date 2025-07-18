@@ -56,8 +56,8 @@
 					let txId = data.txId;
 
 					messageDiv.textContent = txId
-						? `✅ Tokens sent successfully! TxID: ${txId}`
-						: "✅ Tokens sent successfully!";
+						? `{{.Asset}} sent successfully! TxID: ${txId}`
+						: "{{.Asset}} sent successfully!";
 					messageDiv.className = "mt-4 text-green-600 text-center break-words";
 				} else {
 					messageDiv.textContent = data.error || "❌ Something went wrong.";
