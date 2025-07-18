@@ -52,6 +52,7 @@ func NewRouter(config cfg.Config) *Router {
 		faucet := faucet.NewFaucet(config.RPCServerURL(), rpcClient)
 		r.Faucet = faucet
 		r.HandleFunc("/faucet", r.HandleFaucetRequest).Methods(http.MethodPost, http.MethodOptions)
+		r.HandleFunc("/faucet/ui", r.HandleFaucetPage).Methods(http.MethodGet, http.MethodOptions)
 		if config.Chain() == "liquid" {
 			registry, _ := helpers.NewRegistry(config.RegistryPath())
 			r.Registry = registry

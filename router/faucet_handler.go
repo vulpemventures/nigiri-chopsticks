@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"html/template"
 	"io"
 	"net/http"
 )
@@ -122,4 +123,21 @@ func parseRequestBody(body io.ReadCloser) map[string]interface{} {
 	decoder.Decode(&decodedBody)
 
 	return decodedBody
+}
+
+// HandleRegistryRequest will return an HTML page that will allow us to interact with the faucet endpoints
+func (r *Router) HandleFaucetPage(res http.ResponseWriter, _ *http.Request) {
+	filepath := "pages/faucet.html"
+
+	// Parse the HTML file
+	tmpl, err := template.ParseFiles(filepath)
+	if err != nil {
+		http.Error(res, "Page not found", http.StatusNotFound)
+		return
+	}
+	// Render the template
+	err = tmpl.Execute(res, nil)
+	if err != nil {
+		http.Error(res, "Failed to render page", http.StatusInternalServerError)
+	}
 }
