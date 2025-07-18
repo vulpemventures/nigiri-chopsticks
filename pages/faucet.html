@@ -1,3 +1,4 @@
+<!-- template.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +13,8 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 	<div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full">
 		<h1 class="text-3xl font-bold mb-2 text-center text-blue-600">Faucet</h1>
-		<p class="text-gray-600 text-center mb-6">Get your Bitcoin!</p>
+		<p class="text-gray-600 text-center mb-1">Network: <span class="font-semibold">{{ .Network }}</span></p>
+
 		<form id="faucet-form" class="space-y-4">
 			<div>
 				<label for="address" class="block text-gray-700 font-medium">Wallet Address:</label>
@@ -26,7 +28,7 @@
 			</div>
 			<button type="submit"
 				class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
-				Claim Tokens
+				Claim {{.Asset}}
 			</button>
 		</form>
 		<div id="message" class="mt-4 text-center text-sm"></div>

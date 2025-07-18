@@ -135,8 +135,25 @@ func (r *Router) HandleFaucetPage(res http.ResponseWriter, _ *http.Request) {
 		http.Error(res, "Page not found", http.StatusNotFound)
 		return
 	}
+
+	// define a struct with fileds network and asset
+	type PageData struct {
+		Network string
+		Asset   string
+	}
+	network := r.Config.Chain()
+	asset := "BTC"
+	if network == "liquid" {
+		asset = "L-BTC"
+	}
+
+	data := PageData{
+		Network: network,
+		Asset:   asset,
+	}
+
 	// Render the template
-	err = tmpl.Execute(res, nil)
+	err = tmpl.Execute(res, data)
 	if err != nil {
 		http.Error(res, "Failed to render page", http.StatusInternalServerError)
 	}
