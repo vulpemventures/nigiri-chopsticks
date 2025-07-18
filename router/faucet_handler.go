@@ -125,7 +125,7 @@ func parseRequestBody(body io.ReadCloser) map[string]interface{} {
 	return decodedBody
 }
 
-// HandleRegistryRequest will return an HTML page that will allow us to interact with the faucet endpoints
+// HandleFaucetPage will return an HTML page that will allow us to interact with the faucet endpoints
 func (r *Router) HandleFaucetPage(res http.ResponseWriter, _ *http.Request) {
 	filepath := "pages/faucet.html"
 
