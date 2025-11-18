@@ -80,7 +80,7 @@ All requests to chopsticks are (optionally) logged using a logger inspired by [n
 
 ### Bitcoin Node Connection
 - `--rpc-addr` - Bitcoin RPC server address (default: localhost:19001)
-- `--btc-cookie` - Bitcoin RPC credentials (default: admin1:123)
+- `--rpc-cookie` - Bitcoin RPC credentials (default: admin1:123)
 
 ### Liquid Node Connection
 - `--liquid-addr` - Liquid RPC server address (default: localhost:18884)
