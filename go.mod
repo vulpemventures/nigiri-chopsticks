@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/mux v1.7.0
 	github.com/sdomino/scribble v0.0.0-20191024200645-4116320640ba
 	github.com/sirupsen/logrus v1.8.3
-	golang.org/x/crypto v0.51.0
+	golang.org/x/crypto v0.52.0
 )
 
 require (
