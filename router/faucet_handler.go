@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"html/template"
 	"io"
 	"net/http"
 )
@@ -122,4 +123,35 @@ func parseRequestBody(body io.ReadCloser) map[string]interface{} {
 	decoder.Decode(&decodedBody)
 
 	return decodedBody
+}
+
+// HandleFaucetPage will return an HTML page that will allow us to interact with the faucet endpoints
+func (r *Router) HandleFaucetPage(res http.ResponseWriter, _ *http.Request) {
+	filepath := "pages/faucet.html"
+
+	tmpl, err := template.ParseFiles(filepath)
+	if err != nil {
+		http.Error(res, "Page not found", http.StatusNotFound)
+		return
+	}
+
+	type PageData struct {
+		Network string
+		Asset   string
+	}
+	network := r.Config.Chain()
+	asset := "BTC"
+	if network == "liquid" {
+		asset = "L-BTC"
+	}
+
+	data := PageData{
+		Network: network,
+		Asset:   asset,
+	}
+
+	err = tmpl.Execute(res, data)
+	if err != nil {
+		http.Error(res, "Failed to render page", http.StatusInternalServerError)
+	}
 }

@@ -1,0 +1,76 @@
+<!-- template.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Faucet</title>
+	<!-- Tailwind CDN -->
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+	<div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full">
+		<h1 class="text-3xl font-bold mb-2 text-center text-blue-600">Faucet</h1>
+		<p class="text-gray-600 text-center mb-1">Network: <span class="font-semibold">{{ .Network }}</span></p>
+
+		<form id="faucet-form" class="space-y-4">
+			<div>
+				<label for="address" class="block text-gray-700 font-medium">Wallet Address:</label>
+				<input type="text" id="address" name="address" required
+					class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+			</div>
+			<div>
+				<label for="amount" class="block text-gray-700 font-medium">Amount:</label>
+				<input type="number" id="amount" name="amount" min="1" required
+					class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+			</div>
+			<button type="submit"
+				class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+				Claim {{.Asset}}
+			</button>
+		</form>
+		<div id="message" class="mt-4 text-center text-sm"></div>
+	</div>
+
+	<script>
+		document.getElementById("faucet-form").addEventListener("submit", async function (e) {
+			e.preventDefault();
+
+			const address = document.getElementById("address").value;
+			const amount = document.getElementById("amount").value;
+			const messageDiv = document.getElementById("message");
+			try {
+				const res = await fetch("/faucet", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({address, amount})
+				});
+
+				const data = await res.json();
+
+				if (res.ok) {
+					let txId = data.txId;
+
+					messageDiv.textContent = txId
+						? `{{.Asset}} sent successfully! TxID: ${txId}`
+						: "{{.Asset}} sent successfully!";
+					messageDiv.className = "mt-4 text-green-600 text-center break-words";
+				} else {
+					messageDiv.textContent = data.error || "❌ Something went wrong.";
+					messageDiv.className = "mt-4 text-red-600 text-center";
+				}
+			} catch (error) {
+				messageDiv.textContent = "⚠️ Network error. Please try again.";
+				messageDiv.className = "mt-4 text-red-600 text-center";
+			}
+
+
+		});
+	</script>
+</body>
+
+</html>
