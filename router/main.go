@@ -76,12 +76,15 @@ func NewRouter(config cfg.Config) *Router {
 			log.WithField("num_blocks", len(blockHashes)).Info("Faucet has been funded mining some blocks")
 		}
 
-		// From Elements core 0.21 if we use initialfreecoins we must rescan the chain
-		err = helpers.RescanBlockchain(rpcClient)
-		if err != nil {
-			log.WithError(err).Fatalln("rescan blockchain")
+		// From Elements core 0.21 if we use initialfreecoins we must rescan the chain.
+		// Not needed on Bitcoin, and a full rescan can exceed the RPC timeout (#60).
+		if config.Chain() == "liquid" {
+			err = helpers.RescanBlockchain(rpcClient)
+			if err != nil {
+				log.WithError(err).Fatalln("rescan blockchain")
+			}
+			log.Debug("rescan completed")
 		}
-		log.Debug("rescan completed")
 	}
 
 	if config.IsLoggerEnabled() {
